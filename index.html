@@ -22,7 +22,7 @@
         .glass-ui { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; }
         .action-sidebar { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 100; }
         .action-btn { width: 52px; height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 50%; transition: 0.3s; cursor: pointer; }
-        #up-trigger { width: 55px; height: 55px; background: var(--neon); color: #000; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 0 30px var(--neon); cursor: pointer; transform: translateY(-10px); }
+        #up-trigger { width: 55px; height: 55px; background: var(--neon); color: #000; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 0 30px var(--neon); cursor: pointer; transform: translateY(-10px); border: 3px solid #000; }
         nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 88%; max-width: 420px; height: 75px; display: flex; justify-content: space-around; align-items: center; z-index: 200; box-shadow: 0 15px 50px rgba(0,0,0,0.9); }
         .stat-box { background: rgba(0,255,204,0.05); border: 1px solid var(--neon); padding: 20px; border-radius: 25px; text-align: center; margin-bottom: 20px; }
         .overlay { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.97); backdrop-filter: blur(35px); display: none; flex-direction: column; padding: 40px 20px; overflow-y: auto; }
@@ -46,15 +46,15 @@
     <div id="admin-panel" class="overlay">
         <div class="flex justify-between items-center mb-8">
             <h2 class="font-[Orbitron] text-[#00ffcc] text-xl font-black tracking-widest">CLOUD_CONTROL</h2>
-            <i class="fas fa-times text-2xl opacity-30" onclick="toggleAdmin()"></i>
+            <i class="fas fa-times text-2xl opacity-30 cursor-pointer" onclick="toggleAdmin()"></i>
         </div>
         <div class="grid grid-cols-2 gap-4">
             <div class="stat-box">
-                <div class="text-[10px] opacity-40 uppercase mb-1">Live Signals</div>
+                <div class="text-[10px] opacity-40 uppercase mb-1 tracking-widest">Live Signals</div>
                 <div class="text-3xl font-[Orbitron] text-white" id="live-visitors">0</div>
             </div>
             <div class="stat-box">
-                <div class="text-[10px] opacity-40 uppercase mb-1">Total Nodes</div>
+                <div class="text-[10px] opacity-40 uppercase mb-1 tracking-widest">Total Nodes</div>
                 <div class="text-3xl font-[Orbitron] text-white" id="total-vids">0</div>
             </div>
         </div>
@@ -64,7 +64,7 @@
     <div id="chat-ov" class="overlay flex-col">
         <div class="flex justify-between items-center mb-8">
             <h2 class="font-[Orbitron] text-[#00ffcc] tracking-[5px]">ENCRYPTED_LOGS</h2>
-            <i class="fas fa-chevron-down text-2xl opacity-30" onclick="toggleChat()"></i>
+            <i class="fas fa-chevron-down text-2xl opacity-30 cursor-pointer" onclick="toggleChat()"></i>
         </div>
         <div id="chat-box" class="flex-1 overflow-y-auto space-y-4 pr-2"></div>
         <div class="mt-6 flex gap-3 p-3 glass-ui">
@@ -88,7 +88,7 @@
         const USR_ID = "SHADOW-" + Math.floor(Math.random()*999);
         let cachedData = null;
 
-        // تتبع الحضور المباشر
+        // نظام الزوار المباشر (Presence)
         const presenceRef = db.ref('presence/' + USR_ID);
         presenceRef.set(true);
         presenceRef.onDisconnect().remove();
@@ -121,8 +121,8 @@
                     <div class="watermark">VOX_GOD</div>
                     <video id="vid-${id}" loop playsinline muted data-src="${vid.url}" onclick="this.paused?this.play():this.pause()"></video>
                     <div class="v-details">
-                        <div class="v-title font-black">@NODE_${id.substring(1,7)}</div>
-                        <div class="v-desc opacity-50">Signal synchronized from VOX_GOD encrypted cloud.</div>
+                        <div class="v-title font-black">@SIGNAL_DATA</div>
+                        <div class="v-desc opacity-50">الآن يتم العرض من سحابة VOX_GOD الرقمية.</div>
                     </div>
                     <div class="action-sidebar">
                         <div class="action-btn glass-ui text-white" onclick="toggleMute(this, '${id}')"><i class="fas fa-volume-mute"></i></div>
@@ -149,7 +149,7 @@
 
         function deleteVideo(id) { if(confirm("حذف الإشارة نهائياً؟")) { db.ref('vox_god_content/' + id).remove(); setTimeout(renderAdmin, 300); } }
 
-        const myWidget = cloudinary.createUploadWidget({ cloudName: "dqzjfaqg4", uploadPreset: "vox_god" }, (err, res) => {
+        const myWidget = cloudinary.createUploadWidget({ cloudName: "dqzjfaqg4", uploadPreset: "vox_god", styles: { palette: { window: "#010101", windowBorder: "#00ffcc", tabIcon: "#00ffcc", action: "#00ffcc", complete: "#20ff88", textLight: "#ffffff" } } }, (err, res) => {
             if (!err && res.event === "success") db.ref('vox_god_content/').push({ url: res.info.secure_url, likes: 0, timestamp: Date.now() });
         });
         document.getElementById("up-trigger").onclick = () => myWidget.open();
