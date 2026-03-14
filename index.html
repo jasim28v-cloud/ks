@@ -11,46 +11,30 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Cairo:wght@400;700&display=swap');
-        :root { --neon: #00ffcc; --bg: #000; }
-        body, html { margin: 0; padding: 0; height: 100%; background: #000; color: #fff; overflow: hidden; font-family: 'Cairo', sans-serif; user-select: none; }
-        
+        :root { --neon: #00ffcc; --bg: #010101; }
+        body, html { margin: 0; padding: 0; height: 100%; background: var(--bg); color: #fff; overflow: hidden; font-family: 'Cairo', sans-serif; user-select: none; }
         .glass-bg { position: fixed; inset: 0; z-index: -2; background: linear-gradient(135deg, #000, #0a1a15, #000); background-size: 400% 400%; animation: grad 12s ease infinite; }
         @keyframes grad { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
-
-        /* محرك التمرير بدون فراغات */
-        .scroll-engine { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; background: #000; scroll-behavior: smooth; }
+        .scroll-engine { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
         .scroll-engine::-webkit-scrollbar { display: none; }
+        .v-seg { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; overflow: hidden; }
+        video { width: 100%; height: 100%; object-fit: cover; }
+        .glass-ui { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; }
         
-        .v-seg { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center; margin: 0; padding: 0; }
-        video { width: 100%; height: 100%; object-fit: cover; background: #000; }
-
         /* العلامة المائية */
-        .watermark {
-            position: absolute; top: 15%; left: 50%; transform: translate(-50%, -50%);
-            font-family: 'Orbitron'; font-weight: 900; font-size: 2.5rem;
-            color: rgba(255, 255, 255, 0.08); pointer-events: none; z-index: 10;
-            white-space: nowrap; letter-spacing: 10px; text-transform: uppercase;
-        }
+        .watermark { position: absolute; top: 80px; right: 20px; font-family: 'Orbitron'; font-size: 14px; color: rgba(255, 255, 255, 0.3); letter-spacing: 2px; z-index: 100; pointer-events: none; }
 
-        .glass-ui { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; }
-        
-        /* أزرار التفاعل في المنتصف */
-        .center-actions { 
-            position: absolute; left: 15px; top: 50%; transform: translateY(-50%); 
-            display: flex; flex-direction: column; gap: 20px; z-index: 100; 
-        }
-        .action-node { 
-            width: 55px; height: 55px; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; transition: 0.3s; 
-            cursor: pointer;
-        }
-        .action-node:active { transform: scale(0.9); }
+        /* أزرار التفاعل في المنتصف يميناً */
+        .action-sidebar { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 20px; z-index: 100; }
+        .action-btn { width: 50px; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 50%; transition: 0.3s; }
+        .action-btn i { font-size: 20px; }
+        .action-btn span { font-size: 10px; font-weight: bold; margin-top: 2px; }
 
         #up-trigger { width: 55px; height: 55px; background: var(--neon); color: #000; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 0 30px var(--neon); cursor: pointer; transition: 0.3s; }
         nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 88%; max-width: 420px; height: 75px; display: flex; justify-content: space-around; align-items: center; z-index: 200; box-shadow: 0 15px 50px rgba(0,0,0,0.9); }
-        
-        #admin-panel, #chat-ov { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.96); backdrop-filter: blur(30px); display: none; flex-direction: column; padding: 40px 20px; }
+        #admin-panel { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.96); backdrop-filter: blur(30px); display: none; flex-direction: column; padding: 40px 20px; }
         .admin-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 25px; margin-bottom: 15px; padding: 15px; display: flex; align-items: center; gap: 15px; }
+        #chat-ov { position: fixed; inset: 0; z-index: 600; background: rgba(0,0,0,0.92); backdrop-filter: blur(25px); display: none; flex-direction: column; padding: 30px; }
     </style>
 </head>
 <body>
@@ -114,18 +98,19 @@
                 const section = document.createElement('section');
                 section.className = 'v-seg';
                 section.innerHTML = `
-                    <div class="watermark">VOX GOD</div>
+                    <div class="watermark">VOX_GOD</div>
                     <video loop playsinline src="${vid.url}" onclick="this.paused?this.play():this.pause()"></video>
-                    <div class="center-actions">
-                        <div class="action-node glass-ui text-[#00ffcc]" onclick="openAd(); db.ref('vox_god_content/${id}/likes').transaction(l=>(l||0)+1)">
-                            <i class="fas fa-bolt text-lg"></i>
-                            <span class="text-[9px] font-bold mt-1">${vid.likes || 0}</span>
+                    
+                    <div class="action-sidebar">
+                        <div class="action-btn glass-ui text-[#00ffcc]" onclick="openAd(); db.ref('vox_god_content/${id}/likes').transaction(l=>(l||0)+1)">
+                            <i class="fas fa-bolt"></i>
+                            <span>${vid.likes || 0}</span>
                         </div>
-                        <div class="action-node glass-ui text-white" onclick="openAd(); toggleChat()">
-                            <i class="fas fa-comment-dots text-lg"></i>
+                        <div class="action-btn glass-ui text-white" onclick="openAd(); toggleChat()">
+                            <i class="fas fa-comment-dots"></i>
                         </div>
-                        <div class="action-node glass-ui text-white" onclick="openAd(); navigator.share({url:window.location.href})">
-                            <i class="fas fa-share-nodes text-lg"></i>
+                        <div class="action-btn glass-ui text-white" onclick="openAd(); navigator.share({url:window.location.href})">
+                            <i class="fas fa-share-nodes"></i>
                         </div>
                     </div>
                 `;
@@ -142,10 +127,11 @@
             uploadPreset: "vox_god", 
             sources: ['local', 'camera'],
             clientAllowedFormats: ["video"],
-            styles: { palette: { window: "#000", windowBorder: "#00ffcc", tabIcon: "#00ffcc", action: "#00ffcc", textLight: "#fff" } }
+            styles: { palette: { window: "#010101", windowBorder: "#00ffcc", tabIcon: "#00ffcc", action: "#00ffcc", complete: "#20ff88", textLight: "#ffffff" } }
         }, (err, res) => {
             if (!err && res.event === "success") {
                 db.ref('vox_god_content/').push({ url: res.info.secure_url, likes: 0, timestamp: Date.now() });
+                alert("تم الرفع بنجاح!");
             }
         });
         document.getElementById("up-trigger").onclick = () => myWidget.open();
@@ -167,7 +153,7 @@
                     if(e.isIntersecting) v.play().catch(()=>{});
                     else { v.pause(); v.currentTime = 0; }
                 });
-            }, { threshold: 0.7 });
+            }, { threshold: 0.8 });
             document.querySelectorAll('.v-seg').forEach(s => obs.observe(s));
         }
         document.addEventListener('touchstart', () => { document.querySelectorAll('video').forEach(v => v.muted = false); }, { once: true });
