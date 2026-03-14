@@ -2,264 +2,195 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VORTEX ULTRA | THE IONIC PRESTIGE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NEON_VØID | NEXT GEN</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;800&family=Noto+Sans+Arabic:wght@100;400;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Cairo:wght@400;700&display=swap');
         
-        :root {
-            --ionic-glow: #00d4ff;
-            --prestige-bg: #030405;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.08);
+        :root { --neon: #00d9ff; --bg: #00050a; }
+        body, html { margin: 0; padding: 0; height: 100%; background: var(--bg); color: #fff; overflow: hidden; font-family: 'Cairo', sans-serif; user-select: none; }
+
+        .cyber-bg { position: fixed; inset: 0; background: radial-gradient(circle at 50% 50%, #001520 0%, #000 100%); z-index: -1; }
+
+        .scroll-engine { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        .scroll-engine::-webkit-scrollbar { display: none; }
+        
+        .video-segment { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; overflow: hidden; }
+        video { width: 100%; height: 100%; object-fit: cover; }
+
+        .watermark {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg);
+            font-family: 'Orbitron', sans-serif; font-size: 5rem; font-weight: 900;
+            color: var(--neon); opacity: 0.04; pointer-events: none; white-space: nowrap; z-index: 10;
         }
 
-        body {
-            background: var(--prestige-bg);
-            color: #fff;
-            font-family: 'Noto Sans Arabic', sans-serif;
-            margin: 0;
-            overflow-x: hidden;
-            background-image: radial-gradient(circle at 0% 0%, #001a1d 0%, transparent 40%),
-                              radial-gradient(circle at 100% 100%, #1a001d 0%, transparent 40%);
+        header { position: fixed; top: 25px; right: 25px; z-index: 500; display: flex; align-items: center; gap: 15px; }
+        .brand-box { padding: 10px 25px; border-radius: 18px; border: 1px solid var(--neon); box-shadow: 0 0 25px rgba(0,217,255,0.3); background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); }
+        .brand-name { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 16px; letter-spacing: 3px; color: var(--neon); text-shadow: 0 0 12px var(--neon); }
+        .ionic-clock { font-family: 'Orbitron', sans-serif; font-size: 14px; color: var(--neon); background: rgba(0,217,255,0.1); padding: 10px 18px; border-radius: 18px; border: 1px solid rgba(0,217,255,0.2); }
+
+        .side-actions { position: absolute; left: 25px; bottom: 135px; display: flex; flex-direction: column; gap: 20px; z-index: 100; }
+        .action-btn { 
+            width: 60px; height: 60px; border-radius: 22px; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); color: var(--neon);
+        }
+        .action-btn:active { transform: scale(0.85); }
+        .admin-btn { border-color: #ffaa00 !important; color: #ffaa00 !important; }
+
+        .hashtag { position: absolute; bottom: 45px; right: 25px; font-family: 'Orbitron', sans-serif; font-size: 11px; color: var(--neon); background: rgba(0,0,0,0.8); padding: 8px 20px; border-radius: 50px; border: 1px solid var(--neon); z-index: 50; }
+
+        nav { 
+            position: fixed; bottom: 35px; left: 50%; transform: translateX(-50%); 
+            width: 90%; max-width: 420px; height: 75px; border-radius: 35px; 
+            background: rgba(0,5,10,0.9); backdrop-filter: blur(30px); border: 1px solid var(--neon);
+            box-shadow: 0 0 30px -5px var(--neon);
+            display: flex; justify-content: space-around; align-items: center; z-index: 200; 
         }
 
-        /* الهيدر الأيوني */
-        header {
-            position: sticky; top: 0; z-index: 1000;
-            padding: 25px 50px;
-            background: rgba(3, 4, 5, 0.7);
-            backdrop-filter: blur(30px);
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .brand { font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 22px; letter-spacing: 2px; }
-        .brand span { color: var(--ionic-glow); text-shadow: 0 0 20px rgba(0, 212, 255, 0.5); }
-
-        /* حاوية الفيديوهات - شبكة ذكية */
-        .main-stage {
-            max-width: 1600px; margin: 50px auto; padding: 0 40px;
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 40px;
-        }
-
-        .ionic-card {
-            background: var(--glass);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            position: relative; overflow: hidden;
-        }
-
-        .ionic-card:hover {
-            transform: translateY(-15px) scale(1.02);
-            border-color: var(--ionic-glow);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8), 0 0 20px rgba(0, 212, 255, 0.1);
-        }
-
-        .video-canvas {
-            aspect-ratio: 16/9; width: 100%; position: relative; overflow: hidden;
-            mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
-        }
-
-        .video-canvas video { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-
-        .card-details { padding: 25px; }
-        .card-id { font-family: 'Plus Jakarta Sans'; font-size: 10px; opacity: 0.3; letter-spacing: 3px; }
-
-        /* المشغل الألترا (Full Overlay) */
-        .v-player-overlay {
-            position: fixed; inset: 0; background: rgba(2, 2, 3, 0.98);
-            z-index: 5000; display: none; overflow-y: auto;
-        }
-
-        .player-wrapper {
-            max-width: 1200px; margin: 60px auto; padding: 0 20px;
-        }
-
-        .screen {
-            border-radius: 30px; overflow: hidden; box-shadow: 0 50px 100px rgba(0,0,0,0.9);
-            border: 1px solid rgba(255,255,255,0.05); background: #000;
-        }
-
-        .control-panel {
-            margin-top: 40px; display: flex; gap: 40px;
-        }
-
-        .glass-btn {
-            background: var(--glass); border: 1px solid var(--border);
-            padding: 15px 30px; border-radius: 18px; transition: 0.3s;
-            display: flex; align-items: center; gap: 10px;
-        }
-        .glass-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--ionic-glow); color: var(--ionic-glow); }
-
-        /* زر الرفع الأنيق */
-        .fab-ionic {
-            position: fixed; bottom: 40px; left: 40px;
-            width: 70px; height: 70px; background: #fff; color: #000;
-            border-radius: 22px; display: flex; align-items: center; justify-content: center;
-            font-size: 24px; cursor: pointer; transition: 0.4s; z-index: 2000;
-            box-shadow: 0 20px 40px rgba(255,255,255,0.1);
-        }
-        .fab-ionic:hover { border-radius: 50%; background: var(--ionic-glow); transform: rotate(90deg); }
-
-        footer { text-align: center; padding: 100px 20px; color: #222; font-family: 'Plus Jakarta Sans'; font-size: 12px; letter-spacing: 8px; }
+        #chat-overlay { position: fixed; inset: 0; z-index: 600; background: rgba(0,2,5,0.99); display: none; flex-direction: column; padding: 35px; }
+        .admin-panel { position: fixed; inset: 0; z-index: 999; background: #000; display: none; flex-direction: column; padding: 45px 25px; }
     </style>
 </head>
 <body>
 
+    <div class="cyber-bg"></div>
+
     <header>
-        <div class="brand">VORTEX_<span>ULTRA</span></div>
-        <div class="flex items-center gap-8">
-            <div id="status" class="flex items-center gap-2 text-[10px] opacity-40 font-bold tracking-widest">
-                <span class="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse"></span> SYSTEM_PRESTIGE_ON
-            </div>
-            <div id="clock" class="font-[Plus Jakarta Sans] text-sm opacity-60">00:00:00</div>
-        </div>
+        <div class="brand-box"><span class="brand-name">NEON_VØID</span></div>
+        <div class="ionic-clock" id="clock">00:00:00</div>
     </header>
 
-    <main class="main-stage" id="feed"></main>
+    <main class="scroll-engine" id="video-stack"></main>
 
-    <div id="playerUI" class="v-player-overlay">
-        <div class="player-wrapper">
-            <div class="flex justify-between items-center mb-8">
-                <button onclick="closeVideo()" class="text-white/30 hover:text-white transition"><i class="fas fa-arrow-right ml-2"></i> ESCAPE_VIEW</button>
-                <div class="brand scale-75">VORTEX_<span>PRESTIGE</span></div>
-            </div>
+    <nav>
+        <i class="fas fa-satellite-dish text-white/20 text-xl"></i>
+        <div id="upload-trigger" class="w-16 h-16 bg-[#00d9ff] text-black rounded-[25px] flex items-center justify-center shadow-[0_0_30px_#00d9ff] cursor-pointer">
+            <i class="fas fa-plus text-2xl"></i>
+        </div>
+        <i class="fas fa-comment-alt text-[#00d9ff] text-2xl cursor-pointer" onclick="toggleChat()"></i>
+    </nav>
 
-            <div class="screen">
-                <video id="v-main" controls class="w-full h-full"></video>
-            </div>
-
-            <div class="control-panel flex-col md:flex-row">
-                <div class="flex-1">
-                    <h1 id="v-title" class="text-4xl font-black mb-4">SESSION_LOAD...</h1>
-                    <p class="opacity-40 text-sm leading-relaxed mb-8">نظام البث الأيوني المتقدم. تم تشفير البيانات وتحسينها للعرض السينمائي 2026.</p>
-                    
-                    <div class="flex gap-4">
-                        <div class="glass-btn" onclick="likeVideo()">
-                            <i class="fas fa-heart text-pink-500"></i>
-                            <span id="v-likes" class="font-bold">0</span>
-                        </div>
-                        <div class="glass-btn" onclick="shareVideo()">
-                            <i class="fas fa-share-alt"></i>
-                            <span>SHARE</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="w-full md:w-[400px]">
-                    <h3 class="font-bold mb-4 flex items-center gap-2">
-                        <span class="w-2 h-2 bg-blue-500 rounded-full"></span> المناقشة
-                    </h3>
-                    <div id="v-comments" class="space-y-4 max-h-[300px] overflow-y-auto mb-4 pr-2"></div>
-                    <div class="flex gap-2">
-                        <input type="text" id="c-input" class="bg-white/5 border border-white/10 rounded-xl p-4 flex-1 outline-none text-sm" placeholder="أضف بصمتك...">
-                        <button onclick="sendComment()" class="bg-white text-black px-6 rounded-xl font-bold"><i class="fas fa-paper-plane"></i></button>
-                    </div>
-                </div>
-            </div>
+    <div id="chat-overlay">
+        <div class="flex justify-between items-center mb-10">
+            <h2 class="font-[Orbitron] text-[#00d9ff] tracking-[5px] text-xl">CYBER_COMM</h2>
+            <i class="fas fa-times text-white/40 text-2xl" onclick="toggleChat()"></i>
+        </div>
+        <div id="chat-box" class="flex-1 overflow-y-auto space-y-5 pr-3"></div>
+        <div class="mt-8 flex gap-4 p-2 bg-white/5 rounded-2xl border border-cyan-500/20">
+            <input type="text" id="msg-input" class="bg-transparent flex-1 outline-none px-5 py-4" placeholder="Transmit data...">
+            <button onclick="sendMsg()" class="bg-[#00d9ff] text-black px-10 rounded-xl font-black">SEND</button>
         </div>
     </div>
 
-    <div class="fab-ionic" id="upBtn"><i class="fas fa-plus"></i></div>
-
-    <footer>VORTEX_ULTRA_SYSTEM_2026_X</footer>
+    <div id="admin-overlay" class="admin-panel">
+        <div class="flex justify-between items-center mb-12">
+            <h2 class="font-[Orbitron] text-[#ffaa00] text-2xl">CORE_OVERRIDE</h2>
+            <button onclick="toggleAdmin()" class="bg-white/10 px-10 py-3 rounded-full text-xs">DISCONNECT</button>
+        </div>
+        <div id="admin-list" class="space-y-5 overflow-y-auto"></div>
+    </div>
 
     <script>
-        const firebaseConfig = { databaseURL: "https://fokx-c135a-default-rtdb.firebaseio.com/" };
+        const ADMIN_PASS = "2026"; // كلمة السر الجديدة لعام 2026
+        const AD_LINKS = ["https://www.effectivegatecpm.com/bxwxuk2f39?key=566216691dc8b76a740840e94f68f44c", "https://www.effectivegatecpm.com/k60w64w4gk?key=564f3d8cc4ac85949f218179b742495e"];
+        let currentAd = 0;
+        const USR_ID = "VOID-" + Math.floor(Math.random()*9999);
+
+        // إعداد قاعدة بيانات جديدة لموقعك الجديد
+        const firebaseConfig = { databaseURL: "https://goms-8fdfd-default-rtdb.firebaseio.com" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const USR_ID = "ELITE-" + Math.floor(Math.random()*999);
-        let activeID = null;
 
-        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
+        function updateClock() { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }
+        setInterval(updateClock, 1000);
 
-        // جلب البيانات بتصميم البطاقات الأيوني
-        db.ref('videos').on('value', snap => {
-            const feed = document.getElementById('feed');
+        db.ref('neon_void_content').on('value', (snap) => {
+            const container = document.getElementById('video-stack');
+            const adminList = document.getElementById('admin-list');
             const data = snap.val();
-            feed.innerHTML = '';
+            container.innerHTML = ''; adminList.innerHTML = '';
             if(!data) return;
-
-            Object.keys(data).reverse().forEach(id => {
-                const v = data[id];
-                const card = document.createElement('div');
-                card.className = 'ionic-card';
-                card.onclick = () => openVideo(id, v);
-                card.innerHTML = `
-                    <div class="video-canvas">
-                        <video src="${v.url}#t=1" muted onmouseover="this.play()" onmouseout="this.pause()"></video>
-                    </div>
-                    <div class="card-details">
-                        <div class="card-id mb-2">SEQUENCE // ${id.substring(1,9)}</div>
-                        <div class="flex justify-between items-center">
-                            <span class="font-bold text-lg">PRESTIGE_FEED</span>
-                            <span class="text-cyan-400 font-bold"><i class="fas fa-bolt"></i> ${v.likes || 0}</span>
+            
+            Object.keys(data).reverse().forEach((id) => {
+                const vid = data[id];
+                const section = document.createElement('section');
+                section.className = 'video-segment';
+                section.innerHTML = `
+                    <div class="crystal-frame">
+                        <div class="watermark">NEON VØID</div>
+                        <video loop playsinline src="${vid.url}" onclick="this.paused?this.play():this.pause()"></video>
+                        <div class="hashtag">#NEXT_GEN_2026</div>
+                        <div class="side-actions">
+                            <div class="action-btn admin-btn" onclick="checkAdmin()">
+                                <i class="fas fa-key"></i>
+                                <span class="text-[8px] mt-1">CORE</span>
+                            </div>
+                            <div class="action-btn" onclick="triggerAd(); db.ref('neon_void_content/${id}/likes').transaction(l=>(l||0)+1)">
+                                <i class="fas fa-atom"></i>
+                                <span class="text-[11px] mt-1 font-bold">${vid.likes || 0}</span>
+                            </div>
+                            <div class="action-btn" onclick="toggleChat()"><i class="fas fa-wave-square"></i></div>
+                            <div class="action-btn" onclick="triggerAd(); navigator.share({url:window.location.href})"><i class="fas fa-expand-arrows-alt"></i></div>
                         </div>
                     </div>
                 `;
-                feed.appendChild(card);
+                container.appendChild(section);
+
+                adminList.innerHTML += `<div class="flex items-center gap-5 p-5 bg-white/5 rounded-[25px] border border-cyan-500/10">
+                    <video class="w-20 h-20 rounded-2xl object-cover" src="${vid.url}"></video>
+                    <div class="flex-1 text-[10px] font-[Orbitron] opacity-30">${id}</div>
+                    <i class="fas fa-power-off text-red-500 p-4 bg-red-500/10 rounded-full" onclick="if(confirm('PURGE DATA?')) db.ref('neon_void_content/${id}').remove()"></i>
+                </div>`;
             });
+            initObserver();
         });
 
-        function openVideo(id, v) {
-            activeID = id;
-            document.getElementById('v-main').src = v.url;
-            document.getElementById('v-likes').innerText = v.likes || 0;
-            document.getElementById('v-title').innerText = "VORTEX_ULTRA_" + id.substring(1,7);
-            document.getElementById('playerUI').style.display = 'block';
-            loadComments(id);
-        }
+        function triggerAd() { window.open(AD_LINKS[currentAd], '_blank'); currentAd = (currentAd + 1) % AD_LINKS.length; }
+        function toggleChat() { const c = document.getElementById('chat-overlay'); c.style.display = c.style.display==='flex'?'none':'flex'; }
+        function checkAdmin() { if(prompt("ACCESS CODE:")===ADMIN_PASS) toggleAdmin(); }
+        function toggleAdmin() { const a = document.getElementById('admin-overlay'); a.style.display = a.style.display==='flex'?'none':'flex'; }
 
-        function closeVideo() {
-            document.getElementById('playerUI').style.display = 'none';
-            document.getElementById('v-main').pause();
+        function sendMsg() {
+            const inp = document.getElementById('msg-input');
+            if(inp.value.trim()){ db.ref('neon_chat').push({user:USR_ID, text:inp.value}); inp.value=''; }
         }
-
-        function likeVideo() {
-            db.ref(`videos/${activeID}/likes`).transaction(l => (l || 0) + 1);
-            window.open("https://www.effectivegatecpm.com/f1rpr4x6na?key=3f71d8641b99c667506687ede5ebac90", "_blank");
-        }
-
-        function sendComment() {
-            const inp = document.getElementById('c-input');
-            if(inp.value.trim()) {
-                db.ref(`comments/${activeID}`).push({ u: USR_ID, t: inp.value });
-                inp.value = '';
-            }
-        }
-
-        function loadComments(id) {
-            db.ref(`comments/${id}`).on('value', s => {
-                const box = document.getElementById('v-comments');
-                box.innerHTML = '';
-                s.forEach(m => {
-                    const d = m.val();
-                    box.innerHTML += `<div class="bg-white/5 p-4 rounded-2xl border-r border-white/10">
-                        <div class="text-[9px] text-cyan-400 font-bold mb-1 opacity-50">${d.u}</div>
-                        <div class="text-sm">${d.t}</div>
-                    </div>`;
-                });
+        db.ref('neon_chat').limitToLast(25).on('value', s => {
+            const box = document.getElementById('chat-box'); box.innerHTML = '';
+            s.forEach(m => {
+                const d = m.val();
+                box.innerHTML += `<div class="p-5 bg-cyan-500/5 border border-cyan-500/10 rounded-3xl">
+                    <span class="text-[9px] text-[#00d9ff] font-[Orbitron] block mb-2 opacity-50">${d.user}</span>
+                    <p class="text-sm line-height-6">${d.text}</p>
+                </div>`;
             });
-        }
+            box.scrollTop = box.scrollHeight;
+        });
 
-        function shareVideo() { window.open("https://www.effectivegatecpm.com/w6ejwgptb?key=b77b52a8f4f7e4cdd1ac7bccc1b04a4d", "_blank"); }
-
-        const widget = cloudinary.createUploadWidget({ 
-            cloudName: "dk5kas1gc", uploadPreset: "go_kck"
+        const myWidget = cloudinary.createUploadWidget({ 
+            cloudName: "dpcysggzh", uploadPreset: "poro_go",
+            styles: { palette: { window: "#00050a", sourceBg: "#00050a", windowBorder: "#00d9ff", tabIcon: "#00d9ff", inactiveTabIcon: "#003344", menuIcons: "#00d9ff", link: "#00d9ff", action: "#00d9ff", inProgress: "#00d9ff", complete: "#20ff88", error: "#ff2222", textDark: "#000000", textLight: "#ffffff" } }
         }, (err, res) => {
-            if(!err && res.event === "success") {
-                db.ref('videos').push({url: res.info.secure_url, likes: 0});
-                alert("تم رفع المحتوى بنجاح!");
-            }
+            if (!err && res.event === "success") db.ref('neon_void_content/').push({ url: res.info.secure_url, likes: 0, timestamp: Date.now() });
         });
-        document.getElementById('upBtn').onclick = () => widget.open();
+        document.getElementById("upload-trigger").onclick = () => myWidget.open();
+
+        function initObserver() {
+            const obs = new IntersectionObserver((es) => {
+                es.forEach(e => {
+                    const v = e.target.querySelector('video');
+                    if(e.isIntersecting) v.play().catch(()=>{});
+                    else { v.pause(); v.currentTime = 0; }
+                });
+            }, { threshold: 0.8 });
+            document.querySelectorAll('.video-segment').forEach(s => obs.observe(s));
+        }
+        document.addEventListener('touchstart', () => { document.querySelectorAll('video').forEach(v => v.muted = false); }, { once: true });
     </script>
 </body>
 </html>
