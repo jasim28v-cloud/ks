@@ -18,24 +18,32 @@
         .scroll-engine { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
         .scroll-engine::-webkit-scrollbar { display: none; }
         .v-seg { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; overflow: hidden; }
-        video { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.5s; }
+        video { width: 100%; height: 100%; object-fit: cover; }
         .glass-ui { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; }
+        
         .watermark { position: absolute; top: 80px; right: 20px; font-family: 'Orbitron'; font-size: 14px; color: rgba(255, 255, 255, 0.3); letter-spacing: 2px; z-index: 100; pointer-events: none; }
+
+        /* أزرار التفاعل في المنتصف يميناً */
         .action-sidebar { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 100; }
         .action-btn { width: 50px; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 50%; transition: 0.3s; cursor: pointer; }
+        .action-btn i { font-size: 18px; }
+        .action-btn span { font-size: 10px; font-weight: bold; margin-top: 2px; }
+
+        /* وصف الفيديو في الأسفل */
         .v-details { position: absolute; bottom: 120px; left: 20px; right: 80px; z-index: 100; pointer-events: none; }
         .v-title { font-family: 'Orbitron'; color: var(--neon); font-size: 16px; font-weight: 900; margin-bottom: 5px; text-shadow: 0 2px 10px rgba(0,255,204,0.3); }
         .v-desc { font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.4; max-width: 80%; }
+
         #up-trigger { width: 55px; height: 55px; background: var(--neon); color: #000; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 0 30px var(--neon); cursor: pointer; transition: 0.3s; }
         nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 88%; max-width: 420px; height: 75px; display: flex; justify-content: space-around; align-items: center; z-index: 200; box-shadow: 0 15px 50px rgba(0,0,0,0.9); }
-        #admin-panel { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.96); backdrop-filter: blur(30px); display: none; flex-direction: column; padding: 40px 20px; overflow-y: auto; }
+        #admin-panel { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.96); backdrop-filter: blur(30px); display: none; flex-direction: column; padding: 40px 20px; }
         #chat-ov { position: fixed; inset: 0; z-index: 600; background: rgba(0,0,0,0.92); backdrop-filter: blur(25px); display: none; flex-direction: column; padding: 30px; }
     </style>
 </head>
 <body>
     <div class="glass-bg"></div>
     <header class="fixed top-5 left-5 right-5 z-[500] flex justify-between pointer-events-none">
-        <div class="brand-box glass-ui px-5 py-2 pointer-events-auto" onclick="fireAd(ADS.main)"><span class="font-[Orbitron] font-black tracking-widest text-[14px] text-[#00ffcc]">VOX_GOD</span></div>
+        <div class="brand-box glass-ui px-5 py-2 pointer-events-auto"><span class="font-[Orbitron] font-black tracking-widest text-[14px] text-[#00ffcc]">VOX_GOD</span></div>
         <div class="glass-ui p-2 px-5 font-[Orbitron] text-[12px] text-white" id="clock">00:00:00</div>
     </header>
 
@@ -44,18 +52,15 @@
     <nav class="glass-ui">
         <div class="cursor-pointer text-white/30" onclick="checkAdmin()"><i class="fas fa-user-shield text-xl"></i></div>
         <div id="up-trigger"><i class="fas fa-plus"></i></div>
-        <div class="cursor-pointer" onclick="openChatWithAd()"><i class="fas fa-comment-dots text-[#00ffcc] text-2xl"></i></div>
+        <div class="cursor-pointer" onclick="openAd(); toggleChat()"><i class="fas fa-comment-dots text-[#00ffcc] text-2xl"></i></div>
     </nav>
 
     <div id="admin-panel">
         <div class="flex justify-between items-center mb-10">
-            <h2 class="font-[Orbitron] text-[#ffaa00] text-xl font-black">CONTROL_CENTER</h2>
-            <div class="flex gap-4 items-center">
-                <span class="text-[10px] opacity-50">Online: <span id="live-visitors">0</span></span>
-                <button onclick="toggleAdmin()" class="bg-white/10 p-2 rounded-full"><i class="fas fa-times"></i></button>
-            </div>
+            <h2 class="font-[Orbitron] text-[#ffaa00] text-2xl font-black">CONTROL_CENTER</h2>
+            <button onclick="toggleAdmin()" class="bg-white/10 p-4 rounded-full"><i class="fas fa-times"></i></button>
         </div>
-        <div id="admin-list" class="flex-1 space-y-4"></div>
+        <div id="admin-list" class="flex-1 overflow-y-auto space-y-4"></div>
     </div>
 
     <div id="chat-ov">
@@ -71,29 +76,19 @@
     </div>
 
     <script>
-        // SHADOW MIRAGE ONLINE 🔥🧠
         const MASTER_KEY = "1234";
-        const ADS = {
-            main: "https://www.effectivegatecpm.com/q7bf96ad4p?key=4272e67963ce67f1cfaeb4a56682d6ec",
-            bolt: "https://www.effectivegatecpm.com/w6ejwgptb?key=b77b52a8f4f7e4cdd1ac7bccc1b04a4d",
-            chat: "https://www.effectivegatecpm.com/ywn2a0wz7?key=7433561eca4a0920fafc9d653809bab2",
-            share: "https://www.effectivegatecpm.com/f1rpr4x6na?key=3f71d8641b99c667506687ede5ebac90"
-        };
+        const AD_LINKS = [
+            "https://www.effectivegatecpm.com/q7bf96ad4p?key=4272e67963ce67f1cfaeb4a56682d6ec",
+            "https://www.effectivegatecpm.com/w6ejwgptb?key=b77b52a8f4f7e4cdd1ac7bccc1b04a4d"
+        ];
+        let currentAd = 0;
 
         firebase.initializeApp({ databaseURL: "https://xkom-a73e4-default-rtdb.firebaseio.com/" });
         const db = firebase.database();
-        const USR_ID = "ION-" + Math.floor(Math.random()*999);
-        let cachedData = null;
 
-        // نظام الزوار (Presence)
-        const presenceRef = db.ref('presence/' + USR_ID);
-        presenceRef.set(true);
-        presenceRef.onDisconnect().remove();
-        db.ref('presence').on('value', s => { if(document.getElementById('live-visitors')) document.getElementById('live-visitors').innerText = s.numChildren(); });
-
-        function fireAd(link) { window.open(link, '_blank'); }
-        function openChatWithAd() { fireAd(ADS.chat); toggleChat(); }
-        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
+        function openAd() { window.open(AD_LINKS[currentAd], '_blank'); currentAd = (currentAd + 1) % 2; }
+        function updateClock() { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }
+        setInterval(updateClock, 1000);
 
         function toggleMute(btn, videoId) {
             const v = document.getElementById('vid-' + videoId);
@@ -101,84 +96,81 @@
             btn.innerHTML = v.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
         }
 
-        // محرك البيانات الأساسي (بدون تغيير في المنطق)
         db.ref('vox_god_content').on('value', (snap) => {
             const container = document.getElementById('video-stack');
+            const adminList = document.getElementById('admin-list');
             const data = snap.val();
+            container.innerHTML = ''; adminList.innerHTML = '';
             if(!data) return;
-            cachedData = data;
-            
-            container.innerHTML = '';
-            const fragment = document.createDocumentFragment();
             Object.keys(data).reverse().forEach((id) => {
                 const vid = data[id];
                 const section = document.createElement('section');
                 section.className = 'v-seg';
                 section.innerHTML = `
                     <div class="watermark">VOX_GOD</div>
-                    <video id="vid-${id}" loop playsinline muted data-src="${vid.url}" onclick="this.paused?this.play():this.pause()"></video>
+                    <video id="vid-${id}" loop playsinline src="${vid.url}" onclick="this.paused?this.play():this.pause()"></video>
+                    
                     <div class="v-details">
                         <div class="v-title">@SIGNAL_DATA</div>
                         <div class="v-desc">الآن يتم العرض من سحابة VOX_GOD. استمتع بتجربة المشاهدة الفريدة.</div>
                     </div>
+
                     <div class="action-sidebar">
-                        <div class="action-btn glass-ui text-white" onclick="toggleMute(this, '${id}')"><i class="fas fa-volume-mute"></i></div>
-                        <div class="action-btn glass-ui text-[#00ffcc]" onclick="fireAd(ADS.bolt); db.ref('vox_god_content/${id}/likes').transaction(l=>(l||0)+1)">
-                            <i class="fas fa-bolt"></i><span>${vid.likes || 0}</span>
+                        <div class="action-btn glass-ui text-white" onclick="toggleMute(this, '${id}')">
+                            <i class="fas fa-volume-up"></i>
                         </div>
-                        <div class="action-btn glass-ui text-white" onclick="openChatWithAd()"><i class="fas fa-comment-dots"></i></div>
-                        <div class="action-btn glass-ui text-white" onclick="fireAd(ADS.share); navigator.share({url:window.location.href})"><i class="fas fa-share-nodes"></i></div>
-                    </div>`;
-                fragment.appendChild(section);
+                        <div class="action-btn glass-ui text-[#00ffcc]" onclick="openAd(); db.ref('vox_god_content/${id}/likes').transaction(l=>(l||0)+1)">
+                            <i class="fas fa-bolt"></i>
+                            <span>${vid.likes || 0}</span>
+                        </div>
+                        <div class="action-btn glass-ui text-white" onclick="openAd(); toggleChat()">
+                            <i class="fas fa-comment-dots"></i>
+                        </div>
+                        <div class="action-btn glass-ui text-white" onclick="openAd(); navigator.share({url:window.location.href})">
+                            <i class="fas fa-share-nodes"></i>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(section);
+                adminList.innerHTML += `<div class="admin-card"><video class="w-16 h-16 rounded-xl object-cover" src="${vid.url}"></video><div class="flex-1 text-[10px] opacity-40">${id}</div><button onclick="deleteVideo('${id}')" class="text-red-500 p-4"><i class="fas fa-trash-alt"></i></button></div>`;
             });
-            container.appendChild(fragment);
             initObserver();
         });
 
-        // وظيفة الإدارة (تُبنى فقط عند الفتح لزيادة السرعة)
-        function renderAdminContent() {
-            const adminList = document.getElementById('admin-list');
-            adminList.innerHTML = '';
-            if(!cachedData) return;
-            Object.keys(cachedData).reverse().forEach(id => {
-                const vid = cachedData[id];
-                adminList.innerHTML += `<div class="glass-ui p-4 flex items-center justify-between"><img src="${vid.url.replace('.mp4', '.jpg')}" class="w-12 h-12 rounded-lg object-cover bg-white/10"><span class="text-[10px] opacity-30">${id.substring(0,10)}</span><button onclick="deleteVideo('${id}')" class="text-red-500 p-2"><i class="fas fa-trash-alt"></i></button></div>`;
-            });
-        }
+        function deleteVideo(id) { if(confirm("حذف الفيديو؟")) db.ref('vox_god_content/' + id).remove(); }
 
-        function deleteVideo(id) { if(confirm("حذف؟")) { db.ref('vox_god_content/' + id).remove(); setTimeout(renderAdminContent, 300); } }
-
-        const myWidget = cloudinary.createUploadWidget({ cloudName: "dqzjfaqg4", uploadPreset: "vox_god" }, (err, res) => {
-            if (!err && res.event === "success") db.ref('vox_god_content/').push({ url: res.info.secure_url, likes: 0, timestamp: Date.now() });
+        const myWidget = cloudinary.createUploadWidget({ 
+            cloudName: "dqzjfaqg4", 
+            uploadPreset: "vox_god", 
+            sources: ['local', 'camera'],
+            clientAllowedFormats: ["video"],
+            styles: { palette: { window: "#010101", windowBorder: "#00ffcc", tabIcon: "#00ffcc", action: "#00ffcc", complete: "#20ff88", textLight: "#ffffff" } }
+        }, (err, res) => {
+            if (!err && res.event === "success") {
+                db.ref('vox_god_content/').push({ url: res.info.secure_url, likes: 0, timestamp: Date.now() });
+                alert("تم الرفع بنجاح!");
+            }
         });
         document.getElementById("up-trigger").onclick = () => myWidget.open();
 
         function toggleChat() { const c = document.getElementById('chat-ov'); c.style.display = c.style.display==='flex'?'none':'flex'; }
-        function checkAdmin() { if(prompt("MASTER KEY:") === MASTER_KEY) { renderAdminContent(); toggleAdmin(); } }
+        function checkAdmin() { if(prompt("ENTER MASTER KEY:") === MASTER_KEY) toggleAdmin(); }
         function toggleAdmin() { const a = document.getElementById('admin-panel'); a.style.display = a.style.display==='flex'?'none':'flex'; }
-        function sendMsg() { const inp = document.getElementById('msg-input'); if(inp.value.trim()){ db.ref('vox_chat').push({user:USR_ID, text:inp.value}); inp.value=''; } }
-
+        function sendMsg() { const inp = document.getElementById('msg-input'); if(inp.value.trim()){ db.ref('vox_chat').push({user:"USER", text:inp.value}); inp.value=''; } }
         db.ref('vox_chat').limitToLast(15).on('value', s => {
             const box = document.getElementById('chat-box'); box.innerHTML = '';
-            s.forEach(m => { const d = m.val(); box.innerHTML += `<div class="p-4 glass-ui mb-2 border-l-2 border-[#00ffcc]"><span class="text-[8px] opacity-30 block mb-1 uppercase">${d.user}</span><p class="text-sm">${d.text}</p></div>`; });
+            s.forEach(m => { const d = m.val(); box.innerHTML += `<div class="p-4 glass-ui mb-2 border-l-2 border-[#00ffcc]"><p class="text-sm">${d.text}</p></div>`; });
             box.scrollTop = box.scrollHeight;
         });
 
-        // محرك المراقب (لتحسين السرعة والتحميل الذكي)
         function initObserver() {
             const obs = new IntersectionObserver((es) => {
                 es.forEach(e => {
                     const v = e.target.querySelector('video');
-                    if(e.isIntersecting) { 
-                        if(!v.src) v.src = v.dataset.src; // تحميل الفيديو فقط عند ظهوره
-                        v.play().catch(()=>{}); 
-                        v.style.opacity = "1";
-                    } else { 
-                        v.pause(); 
-                        v.style.opacity = "0.2";
-                    }
+                    if(e.isIntersecting) v.play().catch(()=>{});
+                    else { v.pause(); v.currentTime = 0; }
                 });
-            }, { threshold: 0.65 });
+            }, { threshold: 0.8 });
             document.querySelectorAll('.v-seg').forEach(s => obs.observe(s));
         }
     </script>
