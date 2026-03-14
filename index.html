@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VOX_GOD | GLASS IONIC v3</title>
+    <title>VOX_GOD | CONTROL PANEL v3.5</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -11,205 +11,182 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Cairo:wght@400;700&display=swap');
-        
-        :root { --neon: #00ffcc; --bg: #030303; }
+        :root { --neon: #00ffcc; --bg: #010101; }
         body, html { margin: 0; padding: 0; height: 100%; background: var(--bg); color: #fff; overflow: hidden; font-family: 'Cairo', sans-serif; user-select: none; }
-
-        /* خلفية زجاجية متحركة الألوان */
-        .glass-background {
-            position: fixed; inset: 0; z-index: -2;
-            background: linear-gradient(45deg, #000, #051a14, #000);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-        }
-        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        
+        .glass-bg { position: fixed; inset: 0; z-index: -2; background: linear-gradient(135deg, #000, #0a1a15, #000); background-size: 400% 400%; animation: grad 12s ease infinite; }
+        @keyframes grad { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
 
         .scroll-engine { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
         .scroll-engine::-webkit-scrollbar { display: none; }
         
-        .video-segment { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; overflow: hidden; }
+        .v-seg { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; overflow: hidden; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* تأثير الزجاج الشفاف (Glassmorphism) */
-        .glass-ui {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(15px) saturate(180%);
-            -webkit-backdrop-filter: blur(15px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
+        .glass-ui { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; }
+        
+        /* زر الرفع المباشر المطور */
+        #up-trigger { 
+            width: 55px; height: 55px; background: var(--neon); color: #000; border-radius: 18px; 
+            display: flex; align-items: center; justify-content: center; font-size: 24px;
+            box-shadow: 0 0 30px var(--neon); cursor: pointer; transition: 0.3s;
         }
+        #up-trigger:active { transform: scale(0.85); box-shadow: 0 0 10px var(--neon); }
 
-        header { position: fixed; top: 20px; left: 20px; right: 20px; z-index: 500; display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
-        .brand-box { padding: 10px 20px; pointer-events: auto; transition: 0.5s; }
-        .brand-name { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 14px; letter-spacing: 4px; color: var(--neon); text-shadow: 0 0 15px var(--neon); }
-        .ionic-clock { font-family: 'Orbitron', sans-serif; font-size: 13px; color: #fff; padding: 10px 15px; }
+        .side-actions { position: absolute; left: 20px; bottom: 120px; display: flex; flex-direction: column; gap: 18px; z-index: 100; }
+        .action-btn { width: 55px; height: 55px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.3s; color: var(--neon); cursor: pointer; }
 
-        .side-actions { position: absolute; left: 20px; bottom: 120px; display: flex; flex-direction: column; gap: 15px; z-index: 100; }
-        .action-btn { 
-            width: 55px; height: 55px; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; transition: 0.3s; color: var(--neon);
+        nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 88%; max-width: 420px; height: 75px; display: flex; justify-content: space-around; align-items: center; z-index: 200; box-shadow: 0 15px 50px rgba(0,0,0,0.9); }
+
+        /* لوحة التحكم الاحترافية */
+        #admin-panel { 
+            position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.96); 
+            backdrop-filter: blur(30px); display: none; flex-direction: column; padding: 40px 20px; 
         }
-        .action-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.1); }
-        .admin-btn { border-color: #ffaa00 !important; color: #ffaa00 !important; }
-
-        .v-info { position: absolute; bottom: 120px; right: 20px; text-align: right; z-index: 50; }
-        .hashtag { font-family: 'Orbitron', sans-serif; font-size: 10px; color: var(--neon); padding: 5px 12px; display: inline-block; margin-bottom: 5px; }
-
-        /* شريط سفلي زجاجي متطور */
-        nav { 
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
-            width: 85%; max-width: 400px; height: 70px; 
-            display: flex; justify-content: space-around; align-items: center; z-index: 200; 
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
-            transition: border-color 1s ease;
-        }
-
-        #upload-trigger { 
-            width: 50px; height: 50px; background: var(--neon); color: #000; border-radius: 15px;
-            display: flex; align-items: center; justify-content: center; font-size: 20px;
-            box-shadow: 0 0 20px var(--neon); cursor: pointer;
-        }
-
-        #chat-overlay { position: fixed; inset: 0; z-index: 600; background: rgba(0,0,0,0.85); backdrop-filter: blur(25px); display: none; flex-direction: column; padding: 30px; }
-        .admin-panel { position: fixed; inset: 0; z-index: 999; background: #000; display: none; flex-direction: column; padding: 30px; }
+        .admin-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 25px; margin-bottom: 15px; padding: 15px; display: flex; align-items: center; gap: 15px; }
+        
+        #chat-ov { position: fixed; inset: 0; z-index: 600; background: rgba(0,0,0,0.92); backdrop-filter: blur(25px); display: none; flex-direction: column; padding: 30px; }
     </style>
 </head>
 <body>
+    <div class="glass-bg"></div>
 
-    <div class="glass-background"></div>
-
-    <header>
-        <div class="brand-box glass-ui"><span class="brand-name">VOX_GOD</span></div>
-        <div class="ionic-clock glass-ui" id="clock">00:00:00</div>
+    <header class="fixed top-5 left-5 right-5 z-[500] flex justify-between pointer-events-none">
+        <div class="brand-box glass-ui px-5 py-2 pointer-events-auto">
+            <span class="font-[Orbitron] font-black tracking-widest text-[14px] text-[#00ffcc]">VOX_GOD</span>
+        </div>
+        <div class="glass-ui p-2 px-5 font-[Orbitron] text-[12px] text-white" id="clock">00:00:00</div>
     </header>
 
     <main class="scroll-engine" id="video-stack"></main>
 
-    <nav class="glass-ui" id="main-nav">
-        <i class="fas fa-layer-group text-white/30 text-xl"></i>
-        <div id="upload-trigger"><i class="fas fa-plus"></i></div>
-        <i class="fas fa-comment-dots text-[#00ffcc] text-2xl cursor-pointer" onclick="toggleChat()"></i>
+    <nav class="glass-ui">
+        <div class="action-btn text-white/30" onclick="checkAdmin()"><i class="fas fa-user-shield text-xl"></i></div>
+        <div id="up-trigger"><i class="fas fa-plus"></i></div>
+        <div class="action-btn" onclick="openAd(); toggleChat()"><i class="fas fa-comment-dots text-2xl"></i></div>
     </nav>
 
-    <div id="chat-overlay">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="font-[Orbitron] text-[#00ffcc] tracking-[5px]">VOX_SYNC.v3</h2>
-            <i class="fas fa-times text-white/40 text-2xl p-2" onclick="toggleChat()"></i>
+    <div id="admin-panel">
+        <div class="flex justify-between items-center mb-10">
+            <div>
+                <h2 class="font-[Orbitron] text-[#ffaa00] text-2xl font-black">CONTROL_CORE</h2>
+                <p class="text-[10px] text-white/40 uppercase tracking-widest">Manage your cloud content</p>
+            </div>
+            <button onclick="toggleAdmin()" class="bg-white/10 p-4 rounded-full"><i class="fas fa-times"></i></button>
         </div>
-        <div id="chat-box" class="flex-1 overflow-y-auto space-y-4 pr-2"></div>
-        <div class="mt-6 flex gap-3 p-2 glass-ui">
-            <input type="text" id="msg-input" class="bg-transparent flex-1 outline-none px-4 py-3" placeholder="Signal...">
-            <button onclick="sendMsg()" class="bg-[#00ffcc] text-black px-8 rounded-xl font-bold text-xs">SEND</button>
-        </div>
+        <div id="admin-list" class="flex-1 overflow-y-auto space-y-4 pr-2">
+            </div>
     </div>
 
-    <div id="admin-overlay" class="admin-panel">
+    <div id="chat-ov">
         <div class="flex justify-between items-center mb-8">
-            <h2 class="font-[Orbitron] text-[#ffaa00]">GOD_CORE_v3</h2>
-            <button onclick="toggleAdmin()" class="bg-white/10 px-6 py-2 rounded-full text-xs">CLOSE</button>
+            <h2 class="font-[Orbitron] text-[#00ffcc] tracking-[5px]">VOX_SYNC</h2>
+            <i class="fas fa-times text-white/40 text-2xl" onclick="toggleChat()"></i>
         </div>
-        <div id="admin-list" class="space-y-4 overflow-y-auto"></div>
+        <div id="chat-box" class="flex-1 overflow-y-auto space-y-4"></div>
+        <div class="mt-6 flex gap-3 p-2 glass-ui">
+            <input type="text" id="msg-input" class="bg-transparent flex-1 outline-none px-4 text-sm" placeholder="Signal...">
+            <button onclick="sendMsg()" class="bg-[#00ffcc] text-black px-8 py-3 rounded-xl font-bold">SEND</button>
+        </div>
     </div>
 
     <script>
-        const ADMIN_PASS = "1234";
-        const AD_LINKS = ["https://www.effectivegatecpm.com/bxwxuk2f39?key=566216691dc8b76a740840e94f68f44c", "https://www.effectivegatecpm.com/k60w64w4gk?key=564f3d8cc4ac85949f218179b742495e"];
+        const MASTER_KEY = "1234"; // رمز لوحة التحكم الخاص بك
+        const AD_LINKS = [
+            "https://www.effectivegatecpm.com/q7bf96ad4p?key=4272e67963ce67f1cfaeb4a56682d6ec",
+            "https://www.effectivegatecpm.com/w6ejwgptb?key=b77b52a8f4f7e4cdd1ac7bccc1b04a4d"
+        ];
         let currentAd = 0;
-        const USR_ID = "VOX-" + Math.floor(Math.random()*9999);
 
-        const firebaseConfig = { databaseURL: "https://xkom-a73e4-default-rtdb.firebaseio.com/" };
-        firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp({ databaseURL: "https://xkom-a73e4-default-rtdb.firebaseio.com/" });
         const db = firebase.database();
 
+        function openAd() { window.open(AD_LINKS[currentAd], '_blank'); currentAd = (currentAd + 1) % 2; }
         function updateClock() { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }
         setInterval(updateClock, 1000);
 
+        // جلب الفيديوهات وتحديث الواجهة والتحكم
         db.ref('vox_god_content').on('value', (snap) => {
             const container = document.getElementById('video-stack');
             const adminList = document.getElementById('admin-list');
             const data = snap.val();
             container.innerHTML = ''; adminList.innerHTML = '';
-            if(!data) return;
             
+            if(!data) return;
             Object.keys(data).reverse().forEach((id) => {
                 const vid = data[id];
+                // واجهة المستخدم
                 const section = document.createElement('section');
-                section.className = 'video-segment';
+                section.className = 'v-seg';
                 section.innerHTML = `
-                    <div class="w-full h-full relative">
-                        <video loop playsinline src="${vid.url}" onclick="this.paused?this.play():this.pause()"></video>
-                        <div class="v-info">
-                            <div class="hashtag glass-ui">#VOX_IONIC_v3</div>
-                        </div>
-                        <div class="side-actions">
-                            <div class="action-btn glass-ui admin-btn" onclick="checkAdmin()">
-                                <i class="fas fa-fingerprint"></i>
-                            </div>
-                            <div class="action-btn glass-ui" onclick="triggerAd(); db.ref('vox_god_content/${id}/likes').transaction(l=>(l||0)+1)">
-                                <i class="fas fa-heart"></i>
-                                <span class="text-[10px] mt-1 font-bold">${vid.likes || 0}</span>
-                            </div>
-                            <div class="action-btn glass-ui" onclick="toggleChat()"><i class="fas fa-comment"></i></div>
-                            <div class="action-btn glass-ui" onclick="triggerAd(); navigator.share({url:window.location.href})"><i class="fas fa-share"></i></div>
-                        </div>
+                    <video loop playsinline src="${vid.url}" onclick="this.paused?this.play():this.pause()"></video>
+                    <div class="side-actions">
+                        <div class="action-btn glass-ui" onclick="openAd(); db.ref('vox_god_content/${id}/likes').transaction(l=>(l||0)+1)"><i class="fas fa-bolt"></i><span class="text-[10px] mt-1 font-bold">${vid.likes || 0}</span></div>
+                        <div class="action-btn glass-ui" onclick="openAd(); toggleChat()"><i class="fas fa-comment-dots"></i></div>
+                        <div class="action-btn glass-ui" onclick="openAd(); navigator.share({url:window.location.href})"><i class="fas fa-share-nodes"></i></div>
                     </div>
                 `;
                 container.appendChild(section);
 
-                adminList.innerHTML += `<div class="flex items-center gap-4 p-4 glass-ui">
-                    <video class="w-16 h-16 rounded-xl object-cover" src="${vid.url}"></video>
-                    <div class="flex-1 text-[10px] font-[Orbitron] opacity-40">${id}</div>
-                    <i class="fas fa-trash text-red-500 p-3" onclick="if(confirm('PURGE?')) db.ref('vox_god_content/${id}').remove()"></i>
-                </div>`;
+                // واجهة الإدارة (لوحة التحكم)
+                adminList.innerHTML += `
+                    <div class="admin-card">
+                        <video class="w-20 h-20 rounded-xl object-cover" src="${vid.url}"></video>
+                        <div class="flex-1">
+                            <div class="text-[10px] opacity-40 font-[Orbitron] mb-2">${id}</div>
+                            <div class="text-[12px]"><i class="fas fa-heart text-red-500 mr-2"></i> ${vid.likes || 0} Like</div>
+                        </div>
+                        <button onclick="deleteVideo('${id}')" class="bg-red-500/20 text-red-500 w-12 h-12 rounded-full"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                `;
             });
             initObserver();
         });
 
-        function triggerAd() { window.open(AD_LINKS[currentAd], '_blank'); currentAd = (currentAd + 1) % AD_LINKS.length; }
-        function toggleChat() { const c = document.getElementById('chat-overlay'); c.style.display = c.style.display==='flex'?'none':'flex'; }
-        function checkAdmin() { if(prompt("SECURITY KEY:")===ADMIN_PASS) toggleAdmin(); }
-        function toggleAdmin() { const a = document.getElementById('admin-overlay'); a.style.display = a.style.display==='flex'?'none':'flex'; }
+        // حذف الفيديو من قاعدة البيانات
+        function deleteVideo(id) { if(confirm("هل أنت متأكد من حذف هذا الفيديو نهائياً؟")) db.ref('vox_god_content/' + id).remove(); }
 
-        function sendMsg() {
-            const inp = document.getElementById('msg-input');
-            if(inp.value.trim()){ db.ref('vox_chat').push({user:USR_ID, text:inp.value}); inp.value=''; }
+        // نظام الرفع المباشر المطور
+        const myWidget = cloudinary.createUploadWidget({ 
+            cloudName: "vox_god", 
+            uploadPreset: "vox_god_preset",
+            sources: ['local', 'camera'],
+            clientAllowedFormats: ["video"],
+            maxFileSize: 50000000, // 50MB
+            styles: { palette: { window: "#010101", windowBorder: "#00ffcc", tabIcon: "#00ffcc", action: "#00ffcc", complete: "#20ff88", textLight: "#ffffff" } }
+        }, (err, res) => {
+            if (!err && res.event === "success") {
+                db.ref('vox_god_content/').push({ url: res.info.secure_url, likes: 0, timestamp: Date.now() });
+                alert("تم الرفع بنجاح إلى السحابة!");
+            }
+        });
+        document.getElementById("up-trigger").onclick = () => myWidget.open();
+
+        // وظائف التنقل
+        function toggleChat() { const c = document.getElementById('chat-ov'); c.style.display = c.style.display==='flex'?'none':'flex'; }
+        function checkAdmin() { if(prompt("ENTER MASTER KEY:") === MASTER_KEY) toggleAdmin(); else alert("ACCESS DENIED"); }
+        function toggleAdmin() { const a = document.getElementById('admin-panel'); a.style.display = a.style.display==='flex'?'none':'flex'; }
+        
+        function sendMsg() { 
+            const inp = document.getElementById('msg-input'); 
+            if(inp.value.trim()){ db.ref('vox_chat').push({user:"GOD-USR", text:inp.value}); inp.value=''; } 
         }
-        db.ref('vox_chat').limitToLast(25).on('value', s => {
+
+        db.ref('vox_chat').limitToLast(20).on('value', s => {
             const box = document.getElementById('chat-box'); box.innerHTML = '';
-            s.forEach(m => {
-                const d = m.val();
-                box.innerHTML += `<div class="p-4 glass-ui mb-2 border-l-2 border-[#00ffcc]"><span class="text-[9px] text-[#00ffcc] block mb-1">${d.user}</span><p class="text-sm">${d.text}</p></div>`;
-            });
+            s.forEach(m => { const d = m.val(); box.innerHTML += `<div class="p-4 glass-ui mb-2 border-l-2 border-[#00ffcc]"><span class="text-[9px] text-[#00ffcc] block mb-1">USER</span><p class="text-sm">${d.text}</p></div>`; });
             box.scrollTop = box.scrollHeight;
         });
 
-        const myWidget = cloudinary.createUploadWidget({ 
-            cloudName: "dqzjfaqg4", uploadPreset: "vox_god_preset",
-            sources: ['local', 'camera'],
-            showAdvancedOptions: false,
-            cropping: false,
-            multiple: false,
-            defaultSource: "local",
-            styles: { palette: { window: "#030303", sourceBg: "#030303", windowBorder: "#00ffcc", tabIcon: "#00ffcc", inactiveTabIcon: "#004433", menuIcons: "#00ffcc", link: "#00ffcc", action: "#00ffcc", inProgress: "#00ffcc", complete: "#20ff88", error: "#ff2222", textDark: "#000000", textLight: "#ffffff" } }
-        }, (err, res) => {
-            if (!err && res.event === "success") db.ref('vox_god_content/').push({ url: res.info.secure_url, likes: 0, timestamp: Date.now() });
-        });
-        document.getElementById("upload-trigger").onclick = () => myWidget.open();
-
         function initObserver() {
-            const colors = ['#00ffcc', '#00d9ff', '#7000ff', '#ff007f', '#ffaa00'];
             const obs = new IntersectionObserver((es) => {
                 es.forEach(e => {
                     const v = e.target.querySelector('video');
-                    if(e.isIntersecting) {
-                        v.play().catch(()=>{});
-                        const clr = colors[Math.floor(Math.random()*colors.length)];
-                        document.documentElement.style.setProperty('--neon', clr);
-                        document.getElementById('main-nav').style.borderColor = clr;
-                    } else { v.pause(); v.currentTime = 0; }
+                    if(e.isIntersecting) v.play().catch(()=>{});
+                    else { v.pause(); v.currentTime = 0; }
                 });
             }, { threshold: 0.8 });
-            document.querySelectorAll('.video-segment').forEach(s => obs.observe(s));
+            document.querySelectorAll('.v-seg').forEach(s => obs.observe(s));
         }
         document.addEventListener('touchstart', () => { document.querySelectorAll('video').forEach(v => v.muted = false); }, { once: true });
     </script>
