@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VOX_GOD | INFINITE GLASS</title>
+    <title>VOX_GOD | CLOUD SYSTEM</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -12,11 +12,11 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Cairo:wght@400;700&display=swap');
         :root { --neon: #00ffcc; --bg: #000; }
-        body, html { margin: 0; padding: 0; height: 100%; background: #000; color: #fff; overflow: hidden; font-family: 'Cairo', sans-serif; }
+        body, html { margin: 0; padding: 0; height: 100%; background: #000; color: #fff; overflow: hidden; font-family: 'Cairo', sans-serif; user-select: none; }
         
         .scroll-engine { 
             height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; 
-            scrollbar-width: none; background: #000;
+            scrollbar-width: none; background: #000; scroll-behavior: smooth;
         }
         .scroll-engine::-webkit-scrollbar { display: none; }
         
@@ -25,34 +25,35 @@
             position: relative; overflow: hidden; background: #000;
             display: flex; align-items: center; justify-content: center;
         }
-        video { width: 100%; height: 100%; object-fit: cover; }
+        video { width: 100%; height: 100%; object-fit: cover; background: #000; }
 
         /* العلامة المائية */
         .watermark {
-            position: absolute; top: 20%; left: 50%; transform: translate(-50%, -50%);
-            font-family: 'Orbitron'; font-weight: 900; font-size: 3rem;
-            color: rgba(255,255,255,0.08); pointer-events: none; z-index: 10;
+            position: absolute; top: 15%; left: 50%; transform: translate(-50%, -50%);
+            font-family: 'Orbitron'; font-weight: 900; font-size: 2.5rem;
+            color: rgba(255, 255, 255, 0.08); pointer-events: none; z-index: 10;
             white-space: nowrap; letter-spacing: 10px;
         }
 
-        .glass-ui { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 25px; }
+        .glass-ui { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; }
         
         /* أزرار التفاعل في المنتصف */
         .center-actions { 
             position: absolute; left: 20px; top: 50%; transform: translateY(-50%); 
-            display: flex; flex-direction: column; gap: 25px; z-index: 100; 
+            display: flex; flex-direction: column; gap: 20px; z-index: 100; 
         }
         .action-node { 
-            width: 60px; height: 60px; display: flex; flex-direction: column; 
+            width: 55px; height: 55px; display: flex; flex-direction: column; 
             align-items: center; justify-content: center; transition: 0.3s; 
             cursor: pointer;
         }
         .action-node:active { transform: scale(0.9); }
 
-        nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 85%; max-width: 400px; height: 70px; display: flex; justify-content: space-around; align-items: center; z-index: 200; }
-        #up-trigger { width: 50px; height: 50px; background: var(--neon); color: #000; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 0 20px var(--neon); cursor: pointer; }
-
-        #admin-panel, #chat-ov { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); display: none; flex-direction: column; padding: 30px; }
+        #up-trigger { width: 55px; height: 55px; background: var(--neon); color: #000; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 0 30px var(--neon); cursor: pointer; transition: 0.3s; }
+        nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 88%; max-width: 420px; height: 75px; display: flex; justify-content: space-around; align-items: center; z-index: 200; box-shadow: 0 15px 50px rgba(0,0,0,0.9); }
+        
+        #admin-panel, #chat-ov { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.96); backdrop-filter: blur(30px); display: none; flex-direction: column; padding: 40px 20px; }
+        .admin-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 25px; margin-bottom: 15px; padding: 15px; display: flex; align-items: center; gap: 15px; }
     </style>
 </head>
 <body>
@@ -60,28 +61,28 @@
     <main class="scroll-engine" id="video-stack"></main>
 
     <nav class="glass-ui">
-        <i class="fas fa-shield-halved text-white/20 text-xl cursor-pointer" onclick="checkAdmin()"></i>
+        <div class="cursor-pointer text-white/30" onclick="checkAdmin()"><i class="fas fa-user-shield text-xl"></i></div>
         <div id="up-trigger"><i class="fas fa-plus"></i></div>
-        <i class="fas fa-comments text-[#00ffcc] text-2xl cursor-pointer" onclick="openAd(); toggleChat()"></i>
+        <div class="cursor-pointer" onclick="openAd(); toggleChat()"><i class="fas fa-comment-dots text-[#00ffcc] text-2xl"></i></div>
     </nav>
 
     <div id="admin-panel">
         <div class="flex justify-between items-center mb-10">
-            <h2 class="font-[Orbitron] text-[#ffaa00] text-xl tracking-widest">CORE_ADMIN</h2>
-            <i class="fas fa-times text-2xl" onclick="toggleAdmin()"></i>
+            <h2 class="font-[Orbitron] text-[#ffaa00] text-2xl font-black">CONTROL_CENTER</h2>
+            <button onclick="toggleAdmin()" class="bg-white/10 p-4 rounded-full"><i class="fas fa-times"></i></button>
         </div>
         <div id="admin-list" class="flex-1 overflow-y-auto space-y-4"></div>
     </div>
 
     <div id="chat-ov">
         <div class="flex justify-between items-center mb-8">
-            <h2 class="font-[Orbitron] text-[#00ffcc]">VOX_SYNC</h2>
-            <i class="fas fa-times text-2xl" onclick="toggleChat()"></i>
+            <h2 class="font-[Orbitron] text-[#00ffcc] tracking-[5px]">VOX_CHAT</h2>
+            <i class="fas fa-times text-white/40 text-2xl cursor-pointer" onclick="toggleChat()"></i>
         </div>
         <div id="chat-box" class="flex-1 overflow-y-auto space-y-4"></div>
         <div class="mt-6 flex gap-3 p-2 glass-ui">
-            <input type="text" id="msg-input" class="bg-transparent flex-1 outline-none px-4" placeholder="Type signal...">
-            <button onclick="sendMsg()" class="bg-[#00ffcc] text-black px-6 py-2 rounded-xl font-bold">SEND</button>
+            <input type="text" id="msg-input" class="bg-transparent flex-1 outline-none px-4 text-sm" placeholder="Signal...">
+            <button onclick="sendMsg()" class="bg-[#00ffcc] text-black px-8 py-3 rounded-xl font-bold">SEND</button>
         </div>
     </div>
 
@@ -125,39 +126,34 @@
                     </div>
                 `;
                 container.appendChild(section);
-                adminList.innerHTML += `<div class="p-4 glass-ui flex items-center justify-between">
-                    <video class="w-12 h-12 rounded object-cover" src="${vid.url}"></video>
-                    <span class="text-[10px] opacity-30">${id}</span>
-                    <i class="fas fa-trash text-red-500" onclick="deleteVideo('${id}')"></i>
-                </div>`;
+                adminList.innerHTML += `<div class="admin-card"><video class="w-16 h-16 rounded-xl object-cover" src="${vid.url}"></video><div class="flex-1 text-[10px] opacity-40">${id}</div><button onclick="deleteVideo('${id}')" class="text-red-500 p-4"><i class="fas fa-trash-alt"></i></button></div>`;
             });
             initObserver();
         });
 
-        function deleteVideo(id) { if(confirm("حذف؟")) db.ref('vox_god_content/' + id).remove(); }
+        function deleteVideo(id) { if(confirm("حذف الفيديو؟")) db.ref('vox_god_content/' + id).remove(); }
 
         const myWidget = cloudinary.createUploadWidget({ 
             cloudName: "dqzjfaqg4", 
-            uploadPreset: "vox_god",
+            uploadPreset: "vox_god", 
             sources: ['local', 'camera'],
-            styles: { palette: { window: "#000", windowBorder: "#00ffcc", tabIcon: "#00ffcc", action: "#00ffcc", textLight: "#fff" } }
+            clientAllowedFormats: ["video"],
+            styles: { palette: { window: "#000", windowBorder: "#00ffcc", tabIcon: "#00ffcc", action: "#00ffcc", complete: "#20ff88", textLight: "#ffffff" } }
         }, (err, res) => {
-            if (!err && res.event === "success") db.ref('vox_god_content/').push({ url: res.info.secure_url, likes: 0, timestamp: Date.now() });
+            if (!err && res.event === "success") {
+                db.ref('vox_god_content/').push({ url: res.info.secure_url, likes: 0, timestamp: Date.now() });
+                alert("تم الرفع بنجاح!");
+            }
         });
         document.getElementById("up-trigger").onclick = () => myWidget.open();
 
         function toggleChat() { const c = document.getElementById('chat-ov'); c.style.display = c.style.display==='flex'?'none':'flex'; }
-        function checkAdmin() { if(prompt("ACCESS KEY:") === MASTER_KEY) toggleAdmin(); }
+        function checkAdmin() { if(prompt("ENTER MASTER KEY:") === MASTER_KEY) toggleAdmin(); }
         function toggleAdmin() { const a = document.getElementById('admin-panel'); a.style.display = a.style.display==='flex'?'none':'flex'; }
-        
-        function sendMsg() { 
-            const inp = document.getElementById('msg-input'); 
-            if(inp.value.trim()){ db.ref('vox_chat').push({text:inp.value}); inp.value=''; } 
-        }
-
-        db.ref('vox_chat').limitToLast(10).on('value', s => {
+        function sendMsg() { const inp = document.getElementById('msg-input'); if(inp.value.trim()){ db.ref('vox_chat').push({user:"USER", text:inp.value}); inp.value=''; } }
+        db.ref('vox_chat').limitToLast(15).on('value', s => {
             const box = document.getElementById('chat-box'); box.innerHTML = '';
-            s.forEach(m => { box.innerHTML += `<div class="p-4 glass-ui mb-2"><p class="text-sm">${m.val().text}</p></div>`; });
+            s.forEach(m => { const d = m.val(); box.innerHTML += `<div class="p-4 glass-ui mb-2 border-l-2 border-[#00ffcc]"><p class="text-sm">${d.text}</p></div>`; });
             box.scrollTop = box.scrollHeight;
         });
 
@@ -168,7 +164,7 @@
                     if(e.isIntersecting) v.play().catch(()=>{});
                     else { v.pause(); v.currentTime = 0; }
                 });
-            }, { threshold: 0.6 });
+            }, { threshold: 0.7 });
             document.querySelectorAll('.v-seg').forEach(s => obs.observe(s));
         }
         document.addEventListener('touchstart', () => { document.querySelectorAll('video').forEach(v => v.muted = false); }, { once: true });
