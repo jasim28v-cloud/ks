@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VOX_GOD | CLOUD SYSTEM</title>
+    <title>VOX_GOD | INFINITE GLASS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -11,54 +11,77 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Cairo:wght@400;700&display=swap');
-        :root { --neon: #00ffcc; --bg: #010101; }
-        body, html { margin: 0; padding: 0; height: 100%; background: var(--bg); color: #fff; overflow: hidden; font-family: 'Cairo', sans-serif; user-select: none; }
-        .glass-bg { position: fixed; inset: 0; z-index: -2; background: linear-gradient(135deg, #000, #0a1a15, #000); background-size: 400% 400%; animation: grad 12s ease infinite; }
-        @keyframes grad { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
-        .scroll-engine { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        :root { --neon: #00ffcc; --bg: #000; }
+        body, html { margin: 0; padding: 0; height: 100%; background: #000; color: #fff; overflow: hidden; font-family: 'Cairo', sans-serif; }
+        
+        .scroll-engine { 
+            height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; 
+            scrollbar-width: none; background: #000;
+        }
         .scroll-engine::-webkit-scrollbar { display: none; }
-        .v-seg { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; overflow: hidden; }
+        
+        .v-seg { 
+            height: 100vh; width: 100vw; scroll-snap-align: start; 
+            position: relative; overflow: hidden; background: #000;
+            display: flex; align-items: center; justify-content: center;
+        }
         video { width: 100%; height: 100%; object-fit: cover; }
-        .glass-ui { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; }
-        #up-trigger { width: 55px; height: 55px; background: var(--neon); color: #000; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 0 30px var(--neon); cursor: pointer; transition: 0.3s; }
-        nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 88%; max-width: 420px; height: 75px; display: flex; justify-content: space-around; align-items: center; z-index: 200; box-shadow: 0 15px 50px rgba(0,0,0,0.9); }
-        #admin-panel { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.96); backdrop-filter: blur(30px); display: none; flex-direction: column; padding: 40px 20px; }
-        .admin-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 25px; margin-bottom: 15px; padding: 15px; display: flex; align-items: center; gap: 15px; }
-        #chat-ov { position: fixed; inset: 0; z-index: 600; background: rgba(0,0,0,0.92); backdrop-filter: blur(25px); display: none; flex-direction: column; padding: 30px; }
+
+        /* العلامة المائية */
+        .watermark {
+            position: absolute; top: 20%; left: 50%; transform: translate(-50%, -50%);
+            font-family: 'Orbitron'; font-weight: 900; font-size: 3rem;
+            color: rgba(255,255,255,0.08); pointer-events: none; z-index: 10;
+            white-space: nowrap; letter-spacing: 10px;
+        }
+
+        .glass-ui { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 25px; }
+        
+        /* أزرار التفاعل في المنتصف */
+        .center-actions { 
+            position: absolute; left: 20px; top: 50%; transform: translateY(-50%); 
+            display: flex; flex-direction: column; gap: 25px; z-index: 100; 
+        }
+        .action-node { 
+            width: 60px; height: 60px; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; transition: 0.3s; 
+            cursor: pointer;
+        }
+        .action-node:active { transform: scale(0.9); }
+
+        nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 85%; max-width: 400px; height: 70px; display: flex; justify-content: space-around; align-items: center; z-index: 200; }
+        #up-trigger { width: 50px; height: 50px; background: var(--neon); color: #000; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 0 20px var(--neon); cursor: pointer; }
+
+        #admin-panel, #chat-ov { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); display: none; flex-direction: column; padding: 30px; }
     </style>
 </head>
 <body>
-    <div class="glass-bg"></div>
-    <header class="fixed top-5 left-5 right-5 z-[500] flex justify-between pointer-events-none">
-        <div class="brand-box glass-ui px-5 py-2 pointer-events-auto"><span class="font-[Orbitron] font-black tracking-widest text-[14px] text-[#00ffcc]">VOX_GOD</span></div>
-        <div class="glass-ui p-2 px-5 font-[Orbitron] text-[12px] text-white" id="clock">00:00:00</div>
-    </header>
 
     <main class="scroll-engine" id="video-stack"></main>
 
     <nav class="glass-ui">
-        <div class="cursor-pointer text-white/30" onclick="checkAdmin()"><i class="fas fa-user-shield text-xl"></i></div>
+        <i class="fas fa-shield-halved text-white/20 text-xl cursor-pointer" onclick="checkAdmin()"></i>
         <div id="up-trigger"><i class="fas fa-plus"></i></div>
-        <div class="cursor-pointer" onclick="openAd(); toggleChat()"><i class="fas fa-comment-dots text-[#00ffcc] text-2xl"></i></div>
+        <i class="fas fa-comments text-[#00ffcc] text-2xl cursor-pointer" onclick="openAd(); toggleChat()"></i>
     </nav>
 
     <div id="admin-panel">
         <div class="flex justify-between items-center mb-10">
-            <h2 class="font-[Orbitron] text-[#ffaa00] text-2xl font-black">CONTROL_CENTER</h2>
-            <button onclick="toggleAdmin()" class="bg-white/10 p-4 rounded-full"><i class="fas fa-times"></i></button>
+            <h2 class="font-[Orbitron] text-[#ffaa00] text-xl tracking-widest">CORE_ADMIN</h2>
+            <i class="fas fa-times text-2xl" onclick="toggleAdmin()"></i>
         </div>
         <div id="admin-list" class="flex-1 overflow-y-auto space-y-4"></div>
     </div>
 
     <div id="chat-ov">
         <div class="flex justify-between items-center mb-8">
-            <h2 class="font-[Orbitron] text-[#00ffcc] tracking-[5px]">VOX_CHAT</h2>
-            <i class="fas fa-times text-white/40 text-2xl cursor-pointer" onclick="toggleChat()"></i>
+            <h2 class="font-[Orbitron] text-[#00ffcc]">VOX_SYNC</h2>
+            <i class="fas fa-times text-2xl" onclick="toggleChat()"></i>
         </div>
         <div id="chat-box" class="flex-1 overflow-y-auto space-y-4"></div>
         <div class="mt-6 flex gap-3 p-2 glass-ui">
-            <input type="text" id="msg-input" class="bg-transparent flex-1 outline-none px-4 text-sm" placeholder="Signal...">
-            <button onclick="sendMsg()" class="bg-[#00ffcc] text-black px-8 py-3 rounded-xl font-bold">SEND</button>
+            <input type="text" id="msg-input" class="bg-transparent flex-1 outline-none px-4" placeholder="Type signal...">
+            <button onclick="sendMsg()" class="bg-[#00ffcc] text-black px-6 py-2 rounded-xl font-bold">SEND</button>
         </div>
     </div>
 
@@ -74,8 +97,6 @@
         const db = firebase.database();
 
         function openAd() { window.open(AD_LINKS[currentAd], '_blank'); currentAd = (currentAd + 1) % 2; }
-        function updateClock() { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }
-        setInterval(updateClock, 1000);
 
         db.ref('vox_god_content').on('value', (snap) => {
             const container = document.getElementById('video-stack');
@@ -88,43 +109,55 @@
                 const section = document.createElement('section');
                 section.className = 'v-seg';
                 section.innerHTML = `
+                    <div class="watermark">VOX GOD</div>
                     <video loop playsinline src="${vid.url}" onclick="this.paused?this.play():this.pause()"></video>
-                    <div class="absolute left-5 bottom-[120px] flex flex-col gap-5 z-50">
-                        <div class="glass-ui w-14 h-14 flex flex-col items-center justify-center text-[#00ffcc]" onclick="openAd(); db.ref('vox_god_content/${id}/likes').transaction(l=>(l||0)+1)"><i class="fas fa-bolt"></i><span class="text-[10px] font-bold">${vid.likes || 0}</span></div>
-                        <div class="glass-ui w-14 h-14 flex items-center justify-center" onclick="openAd(); toggleChat()"><i class="fas fa-comment-dots"></i></div>
-                        <div class="glass-ui w-14 h-14 flex items-center justify-center" onclick="openAd(); navigator.share({url:window.location.href})"><i class="fas fa-share-nodes"></i></div>
+                    <div class="center-actions">
+                        <div class="action-node glass-ui text-[#00ffcc]" onclick="openAd(); db.ref('vox_god_content/${id}/likes').transaction(l=>(l||0)+1)">
+                            <i class="fas fa-bolt text-xl"></i>
+                            <span class="text-[10px] font-bold mt-1">${vid.likes || 0}</span>
+                        </div>
+                        <div class="action-node glass-ui" onclick="openAd(); toggleChat()">
+                            <i class="fas fa-comment-dots text-xl text-white"></i>
+                        </div>
+                        <div class="action-node glass-ui" onclick="openAd(); navigator.share({url:window.location.href})">
+                            <i class="fas fa-share-nodes text-xl text-white"></i>
+                        </div>
                     </div>
                 `;
                 container.appendChild(section);
-                adminList.innerHTML += `<div class="admin-card"><video class="w-16 h-16 rounded-xl object-cover" src="${vid.url}"></video><div class="flex-1 text-[10px] opacity-40">${id}</div><button onclick="deleteVideo('${id}')" class="text-red-500 p-4"><i class="fas fa-trash-alt"></i></button></div>`;
+                adminList.innerHTML += `<div class="p-4 glass-ui flex items-center justify-between">
+                    <video class="w-12 h-12 rounded object-cover" src="${vid.url}"></video>
+                    <span class="text-[10px] opacity-30">${id}</span>
+                    <i class="fas fa-trash text-red-500" onclick="deleteVideo('${id}')"></i>
+                </div>`;
             });
             initObserver();
         });
 
-        function deleteVideo(id) { if(confirm("حذف الفيديو؟")) db.ref('vox_god_content/' + id).remove(); }
+        function deleteVideo(id) { if(confirm("حذف؟")) db.ref('vox_god_content/' + id).remove(); }
 
-        // الربط المحدث بناءً على ملاحظتك
         const myWidget = cloudinary.createUploadWidget({ 
-            cloudName: "dqzjfaqg4", // اسم الحساب من الرابط
-            uploadPreset: "vox_god", // نظام التحميل السحابي
+            cloudName: "dqzjfaqg4", 
+            uploadPreset: "vox_god",
             sources: ['local', 'camera'],
-            clientAllowedFormats: ["video"],
-            styles: { palette: { window: "#010101", windowBorder: "#00ffcc", tabIcon: "#00ffcc", action: "#00ffcc", complete: "#20ff88", textLight: "#ffffff" } }
+            styles: { palette: { window: "#000", windowBorder: "#00ffcc", tabIcon: "#00ffcc", action: "#00ffcc", textLight: "#fff" } }
         }, (err, res) => {
-            if (!err && res.event === "success") {
-                db.ref('vox_god_content/').push({ url: res.info.secure_url, likes: 0, timestamp: Date.now() });
-                alert("تم الرفع بنجاح!");
-            }
+            if (!err && res.event === "success") db.ref('vox_god_content/').push({ url: res.info.secure_url, likes: 0, timestamp: Date.now() });
         });
         document.getElementById("up-trigger").onclick = () => myWidget.open();
 
         function toggleChat() { const c = document.getElementById('chat-ov'); c.style.display = c.style.display==='flex'?'none':'flex'; }
-        function checkAdmin() { if(prompt("ENTER MASTER KEY:") === MASTER_KEY) toggleAdmin(); }
+        function checkAdmin() { if(prompt("ACCESS KEY:") === MASTER_KEY) toggleAdmin(); }
         function toggleAdmin() { const a = document.getElementById('admin-panel'); a.style.display = a.style.display==='flex'?'none':'flex'; }
-        function sendMsg() { const inp = document.getElementById('msg-input'); if(inp.value.trim()){ db.ref('vox_chat').push({user:"USER", text:inp.value}); inp.value=''; } }
-        db.ref('vox_chat').limitToLast(15).on('value', s => {
+        
+        function sendMsg() { 
+            const inp = document.getElementById('msg-input'); 
+            if(inp.value.trim()){ db.ref('vox_chat').push({text:inp.value}); inp.value=''; } 
+        }
+
+        db.ref('vox_chat').limitToLast(10).on('value', s => {
             const box = document.getElementById('chat-box'); box.innerHTML = '';
-            s.forEach(m => { const d = m.val(); box.innerHTML += `<div class="p-4 glass-ui mb-2 border-l-2 border-[#00ffcc]"><p class="text-sm">${d.text}</p></div>`; });
+            s.forEach(m => { box.innerHTML += `<div class="p-4 glass-ui mb-2"><p class="text-sm">${m.val().text}</p></div>`; });
             box.scrollTop = box.scrollHeight;
         });
 
@@ -135,7 +168,7 @@
                     if(e.isIntersecting) v.play().catch(()=>{});
                     else { v.pause(); v.currentTime = 0; }
                 });
-            }, { threshold: 0.8 });
+            }, { threshold: 0.6 });
             document.querySelectorAll('.v-seg').forEach(s => obs.observe(s));
         }
         document.addEventListener('touchstart', () => { document.querySelectorAll('video').forEach(v => v.muted = false); }, { once: true });
