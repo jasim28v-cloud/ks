@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VOX_GOD | CLOUD SYSTEM PRO</title>
+    <title>VOX_GOD | CLOUD SYSTEM</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -15,17 +15,21 @@
         body, html { margin: 0; padding: 0; height: 100%; background: var(--bg); color: #fff; overflow: hidden; font-family: 'Cairo', sans-serif; user-select: none; }
         .glass-bg { position: fixed; inset: 0; z-index: -2; background: linear-gradient(135deg, #000, #0a1a15, #000); background-size: 400% 400%; animation: grad 12s ease infinite; }
         @keyframes grad { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
-        .scroll-engine { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; scroll-behavior: smooth; }
+        .scroll-engine { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
         .scroll-engine::-webkit-scrollbar { display: none; }
         .v-seg { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; overflow: hidden; }
         video { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.5s; }
-        .glass-ui { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; }
+        .glass-ui { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; }
+        .watermark { position: absolute; top: 80px; right: 20px; font-family: 'Orbitron'; font-size: 14px; color: rgba(255, 255, 255, 0.3); letter-spacing: 2px; z-index: 100; pointer-events: none; }
         .action-sidebar { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 100; }
-        .action-btn { width: 52px; height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 50%; transition: 0.3s; cursor: pointer; }
-        #up-trigger { width: 55px; height: 55px; background: var(--neon); color: #000; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 0 30px var(--neon); cursor: pointer; transform: translateY(-10px); border: 3px solid #000; }
+        .action-btn { width: 50px; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 50%; transition: 0.3s; cursor: pointer; }
+        .v-details { position: absolute; bottom: 120px; left: 20px; right: 80px; z-index: 100; pointer-events: none; }
+        .v-title { font-family: 'Orbitron'; color: var(--neon); font-size: 16px; font-weight: 900; margin-bottom: 5px; text-shadow: 0 2px 10px rgba(0,255,204,0.3); }
+        .v-desc { font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.4; max-width: 80%; }
+        #up-trigger { width: 55px; height: 55px; background: var(--neon); color: #000; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 0 30px var(--neon); cursor: pointer; transition: 0.3s; }
         nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 88%; max-width: 420px; height: 75px; display: flex; justify-content: space-around; align-items: center; z-index: 200; box-shadow: 0 15px 50px rgba(0,0,0,0.9); }
-        .stat-box { background: rgba(0,255,204,0.05); border: 1px solid var(--neon); padding: 20px; border-radius: 25px; text-align: center; margin-bottom: 20px; }
-        .overlay { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.97); backdrop-filter: blur(35px); display: none; flex-direction: column; padding: 40px 20px; overflow-y: auto; }
+        #admin-panel { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.96); backdrop-filter: blur(30px); display: none; flex-direction: column; padding: 40px 20px; overflow-y: auto; }
+        #chat-ov { position: fixed; inset: 0; z-index: 600; background: rgba(0,0,0,0.92); backdrop-filter: blur(25px); display: none; flex-direction: column; padding: 30px; }
     </style>
 </head>
 <body>
@@ -38,38 +42,31 @@
     <main class="scroll-engine" id="video-stack"></main>
 
     <nav class="glass-ui">
-        <div class="cursor-pointer text-white/30" onclick="checkAdmin()"><i class="fas fa-fingerprint text-xl"></i></div>
+        <div class="cursor-pointer text-white/30" onclick="checkAdmin()"><i class="fas fa-user-shield text-xl"></i></div>
         <div id="up-trigger"><i class="fas fa-plus"></i></div>
         <div class="cursor-pointer" onclick="openChatWithAd()"><i class="fas fa-comment-dots text-[#00ffcc] text-2xl"></i></div>
     </nav>
 
-    <div id="admin-panel" class="overlay">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="font-[Orbitron] text-[#00ffcc] text-xl font-black tracking-widest">CLOUD_CONTROL</h2>
-            <i class="fas fa-times text-2xl opacity-30 cursor-pointer" onclick="toggleAdmin()"></i>
-        </div>
-        <div class="grid grid-cols-2 gap-4">
-            <div class="stat-box">
-                <div class="text-[10px] opacity-40 uppercase mb-1 tracking-widest">Live Signals</div>
-                <div class="text-3xl font-[Orbitron] text-white" id="live-visitors">0</div>
-            </div>
-            <div class="stat-box">
-                <div class="text-[10px] opacity-40 uppercase mb-1 tracking-widest">Total Nodes</div>
-                <div class="text-3xl font-[Orbitron] text-white" id="total-vids">0</div>
+    <div id="admin-panel">
+        <div class="flex justify-between items-center mb-10">
+            <h2 class="font-[Orbitron] text-[#ffaa00] text-xl font-black">CONTROL_CENTER</h2>
+            <div class="flex gap-4 items-center">
+                <span class="text-[10px] opacity-50">Online: <span id="live-visitors">0</span></span>
+                <button onclick="toggleAdmin()" class="bg-white/10 p-2 rounded-full"><i class="fas fa-times"></i></button>
             </div>
         </div>
-        <div id="admin-list" class="space-y-3 mt-6"></div>
+        <div id="admin-list" class="flex-1 space-y-4"></div>
     </div>
 
-    <div id="chat-ov" class="overlay flex-col">
+    <div id="chat-ov">
         <div class="flex justify-between items-center mb-8">
-            <h2 class="font-[Orbitron] text-[#00ffcc] tracking-[5px]">ENCRYPTED_LOGS</h2>
-            <i class="fas fa-chevron-down text-2xl opacity-30 cursor-pointer" onclick="toggleChat()"></i>
+            <h2 class="font-[Orbitron] text-[#00ffcc] tracking-[5px]">VOX_CHAT</h2>
+            <i class="fas fa-times text-white/40 text-2xl cursor-pointer" onclick="toggleChat()"></i>
         </div>
-        <div id="chat-box" class="flex-1 overflow-y-auto space-y-4 pr-2"></div>
-        <div class="mt-6 flex gap-3 p-3 glass-ui">
-            <input type="text" id="msg-input" class="bg-transparent flex-1 outline-none px-4 text-sm" placeholder="Signal packet...">
-            <button onclick="sendMsg()" class="bg-[#00ffcc] text-black px-8 py-3 rounded-xl font-black">SEND</button>
+        <div id="chat-box" class="flex-1 overflow-y-auto space-y-4"></div>
+        <div class="mt-6 flex gap-3 p-2 glass-ui">
+            <input type="text" id="msg-input" class="bg-transparent flex-1 outline-none px-4 text-sm" placeholder="Signal...">
+            <button onclick="sendMsg()" class="bg-[#00ffcc] text-black px-8 py-3 rounded-xl font-bold">SEND</button>
         </div>
     </div>
 
@@ -85,10 +82,10 @@
 
         firebase.initializeApp({ databaseURL: "https://xkom-a73e4-default-rtdb.firebaseio.com/" });
         const db = firebase.database();
-        const USR_ID = "SHADOW-" + Math.floor(Math.random()*999);
+        const USR_ID = "ION-" + Math.floor(Math.random()*999);
         let cachedData = null;
 
-        // نظام الزوار المباشر (Presence)
+        // نظام الزوار (Presence)
         const presenceRef = db.ref('presence/' + USR_ID);
         presenceRef.set(true);
         presenceRef.onDisconnect().remove();
@@ -104,12 +101,12 @@
             btn.innerHTML = v.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
         }
 
+        // محرك البيانات الأساسي (بدون تغيير في المنطق)
         db.ref('vox_god_content').on('value', (snap) => {
             const container = document.getElementById('video-stack');
             const data = snap.val();
             if(!data) return;
             cachedData = data;
-            document.getElementById('total-vids').innerText = Object.keys(data).length;
             
             container.innerHTML = '';
             const fragment = document.createDocumentFragment();
@@ -121,13 +118,13 @@
                     <div class="watermark">VOX_GOD</div>
                     <video id="vid-${id}" loop playsinline muted data-src="${vid.url}" onclick="this.paused?this.play():this.pause()"></video>
                     <div class="v-details">
-                        <div class="v-title font-black">@SIGNAL_DATA</div>
-                        <div class="v-desc opacity-50">الآن يتم العرض من سحابة VOX_GOD الرقمية.</div>
+                        <div class="v-title">@SIGNAL_DATA</div>
+                        <div class="v-desc">الآن يتم العرض من سحابة VOX_GOD. استمتع بتجربة المشاهدة الفريدة.</div>
                     </div>
                     <div class="action-sidebar">
                         <div class="action-btn glass-ui text-white" onclick="toggleMute(this, '${id}')"><i class="fas fa-volume-mute"></i></div>
                         <div class="action-btn glass-ui text-[#00ffcc]" onclick="fireAd(ADS.bolt); db.ref('vox_god_content/${id}/likes').transaction(l=>(l||0)+1)">
-                            <i class="fas fa-bolt"></i><span class="mt-1">${vid.likes || 0}</span>
+                            <i class="fas fa-bolt"></i><span>${vid.likes || 0}</span>
                         </div>
                         <div class="action-btn glass-ui text-white" onclick="openChatWithAd()"><i class="fas fa-comment-dots"></i></div>
                         <div class="action-btn glass-ui text-white" onclick="fireAd(ADS.share); navigator.share({url:window.location.href})"><i class="fas fa-share-nodes"></i></div>
@@ -138,24 +135,26 @@
             initObserver();
         });
 
-        function renderAdmin() {
-            const list = document.getElementById('admin-list');
-            list.innerHTML = '';
+        // وظيفة الإدارة (تُبنى فقط عند الفتح لزيادة السرعة)
+        function renderAdminContent() {
+            const adminList = document.getElementById('admin-list');
+            adminList.innerHTML = '';
+            if(!cachedData) return;
             Object.keys(cachedData).reverse().forEach(id => {
                 const vid = cachedData[id];
-                list.innerHTML += `<div class="glass-ui p-4 flex items-center gap-4"><img class="w-12 h-12 rounded-lg object-cover" src="${vid.url.replace('.mp4', '.jpg')}"><div class="flex-1 text-[10px] font-mono opacity-30">${id}</div><button onclick="deleteVideo('${id}')" class="text-red-500 p-2"><i class="fas fa-trash-alt"></i></button></div>`;
+                adminList.innerHTML += `<div class="glass-ui p-4 flex items-center justify-between"><img src="${vid.url.replace('.mp4', '.jpg')}" class="w-12 h-12 rounded-lg object-cover bg-white/10"><span class="text-[10px] opacity-30">${id.substring(0,10)}</span><button onclick="deleteVideo('${id}')" class="text-red-500 p-2"><i class="fas fa-trash-alt"></i></button></div>`;
             });
         }
 
-        function deleteVideo(id) { if(confirm("حذف الإشارة نهائياً؟")) { db.ref('vox_god_content/' + id).remove(); setTimeout(renderAdmin, 300); } }
+        function deleteVideo(id) { if(confirm("حذف؟")) { db.ref('vox_god_content/' + id).remove(); setTimeout(renderAdminContent, 300); } }
 
-        const myWidget = cloudinary.createUploadWidget({ cloudName: "dqzjfaqg4", uploadPreset: "vox_god", styles: { palette: { window: "#010101", windowBorder: "#00ffcc", tabIcon: "#00ffcc", action: "#00ffcc", complete: "#20ff88", textLight: "#ffffff" } } }, (err, res) => {
+        const myWidget = cloudinary.createUploadWidget({ cloudName: "dqzjfaqg4", uploadPreset: "vox_god" }, (err, res) => {
             if (!err && res.event === "success") db.ref('vox_god_content/').push({ url: res.info.secure_url, likes: 0, timestamp: Date.now() });
         });
         document.getElementById("up-trigger").onclick = () => myWidget.open();
 
         function toggleChat() { const c = document.getElementById('chat-ov'); c.style.display = c.style.display==='flex'?'none':'flex'; }
-        function checkAdmin() { if(prompt("ENTER MASTER KEY:") === MASTER_KEY) { renderAdmin(); toggleAdmin(); } }
+        function checkAdmin() { if(prompt("MASTER KEY:") === MASTER_KEY) { renderAdminContent(); toggleAdmin(); } }
         function toggleAdmin() { const a = document.getElementById('admin-panel'); a.style.display = a.style.display==='flex'?'none':'flex'; }
         function sendMsg() { const inp = document.getElementById('msg-input'); if(inp.value.trim()){ db.ref('vox_chat').push({user:USR_ID, text:inp.value}); inp.value=''; } }
 
@@ -165,12 +164,19 @@
             box.scrollTop = box.scrollHeight;
         });
 
+        // محرك المراقب (لتحسين السرعة والتحميل الذكي)
         function initObserver() {
             const obs = new IntersectionObserver((es) => {
                 es.forEach(e => {
                     const v = e.target.querySelector('video');
-                    if(e.isIntersecting) { if(!v.src) v.src = v.dataset.src; v.play().catch(()=>{}); v.style.opacity = "1"; }
-                    else { v.pause(); v.style.opacity = "0.2"; }
+                    if(e.isIntersecting) { 
+                        if(!v.src) v.src = v.dataset.src; // تحميل الفيديو فقط عند ظهوره
+                        v.play().catch(()=>{}); 
+                        v.style.opacity = "1";
+                    } else { 
+                        v.pause(); 
+                        v.style.opacity = "0.2";
+                    }
                 });
             }, { threshold: 0.65 });
             document.querySelectorAll('.v-seg').forEach(s => obs.observe(s));
