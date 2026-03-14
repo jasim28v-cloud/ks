@@ -21,19 +21,22 @@
         video { width: 100%; height: 100%; object-fit: cover; }
         .glass-ui { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; }
         
-        /* العلامة المائية */
         .watermark { position: absolute; top: 80px; right: 20px; font-family: 'Orbitron'; font-size: 14px; color: rgba(255, 255, 255, 0.3); letter-spacing: 2px; z-index: 100; pointer-events: none; }
 
         /* أزرار التفاعل في المنتصف يميناً */
-        .action-sidebar { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 20px; z-index: 100; }
-        .action-btn { width: 50px; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 50%; transition: 0.3s; }
-        .action-btn i { font-size: 20px; }
+        .action-sidebar { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 100; }
+        .action-btn { width: 50px; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 50%; transition: 0.3s; cursor: pointer; }
+        .action-btn i { font-size: 18px; }
         .action-btn span { font-size: 10px; font-weight: bold; margin-top: 2px; }
+
+        /* وصف الفيديو في الأسفل */
+        .v-details { position: absolute; bottom: 120px; left: 20px; right: 80px; z-index: 100; pointer-events: none; }
+        .v-title { font-family: 'Orbitron'; color: var(--neon); font-size: 16px; font-weight: 900; margin-bottom: 5px; text-shadow: 0 2px 10px rgba(0,255,204,0.3); }
+        .v-desc { font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.4; max-width: 80%; }
 
         #up-trigger { width: 55px; height: 55px; background: var(--neon); color: #000; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 0 30px var(--neon); cursor: pointer; transition: 0.3s; }
         nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 88%; max-width: 420px; height: 75px; display: flex; justify-content: space-around; align-items: center; z-index: 200; box-shadow: 0 15px 50px rgba(0,0,0,0.9); }
         #admin-panel { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.96); backdrop-filter: blur(30px); display: none; flex-direction: column; padding: 40px 20px; }
-        .admin-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 25px; margin-bottom: 15px; padding: 15px; display: flex; align-items: center; gap: 15px; }
         #chat-ov { position: fixed; inset: 0; z-index: 600; background: rgba(0,0,0,0.92); backdrop-filter: blur(25px); display: none; flex-direction: column; padding: 30px; }
     </style>
 </head>
@@ -87,6 +90,12 @@
         function updateClock() { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }
         setInterval(updateClock, 1000);
 
+        function toggleMute(btn, videoId) {
+            const v = document.getElementById('vid-' + videoId);
+            v.muted = !v.muted;
+            btn.innerHTML = v.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
+        }
+
         db.ref('vox_god_content').on('value', (snap) => {
             const container = document.getElementById('video-stack');
             const adminList = document.getElementById('admin-list');
@@ -99,9 +108,17 @@
                 section.className = 'v-seg';
                 section.innerHTML = `
                     <div class="watermark">VOX_GOD</div>
-                    <video loop playsinline src="${vid.url}" onclick="this.paused?this.play():this.pause()"></video>
+                    <video id="vid-${id}" loop playsinline src="${vid.url}" onclick="this.paused?this.play():this.pause()"></video>
                     
+                    <div class="v-details">
+                        <div class="v-title">@SIGNAL_DATA</div>
+                        <div class="v-desc">الآن يتم العرض من سحابة VOX_GOD. استمتع بتجربة المشاهدة الفريدة.</div>
+                    </div>
+
                     <div class="action-sidebar">
+                        <div class="action-btn glass-ui text-white" onclick="toggleMute(this, '${id}')">
+                            <i class="fas fa-volume-up"></i>
+                        </div>
                         <div class="action-btn glass-ui text-[#00ffcc]" onclick="openAd(); db.ref('vox_god_content/${id}/likes').transaction(l=>(l||0)+1)">
                             <i class="fas fa-bolt"></i>
                             <span>${vid.likes || 0}</span>
@@ -156,7 +173,6 @@
             }, { threshold: 0.8 });
             document.querySelectorAll('.v-seg').forEach(s => obs.observe(s));
         }
-        document.addEventListener('touchstart', () => { document.querySelectorAll('video').forEach(v => v.muted = false); }, { once: true });
     </script>
 </body>
 </html>
