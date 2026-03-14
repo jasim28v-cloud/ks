@@ -12,38 +12,34 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Cairo:wght@400;700&display=swap');
         :root { --neon: #00ffcc; --bg: #010101; }
-        body, html { margin: 0; padding: 0; height: 100%; background: var(--bg); color: #fff; overflow: hidden; font-family: 'Cairo', sans-serif; user-select: none; }
+        body, html { margin: 0; padding: 0; height: 100%; background: var(--bg); color: #fff; overflow: hidden; font-family: 'Cairo', sans-serif; user-select: none; touch-action: manipulation; }
         .glass-bg { position: fixed; inset: 0; z-index: -2; background: linear-gradient(135deg, #000, #0a1a15, #000); background-size: 400% 400%; animation: grad 12s ease infinite; }
         @keyframes grad { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
-        .scroll-engine { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
+        .scroll-engine { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; -ms-overflow-style: none; }
         .scroll-engine::-webkit-scrollbar { display: none; }
-        .v-seg { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; overflow: hidden; }
-        video { width: 100%; height: 100%; object-fit: cover; }
+        .v-seg { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        video { width: 100%; height: 100%; object-fit: cover; background: #000; }
         .glass-ui { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; }
         
-        .watermark { position: absolute; top: 80px; right: 20px; font-family: 'Orbitron'; font-size: 14px; color: rgba(255, 255, 255, 0.3); letter-spacing: 2px; z-index: 100; pointer-events: none; }
+        .watermark { position: absolute; top: 80px; right: 20px; font-family: 'Orbitron'; font-size: 14px; color: rgba(0, 255, 204, 0.4); letter-spacing: 2px; z-index: 100; pointer-events: none; }
 
-        .action-sidebar { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 100; }
-        .action-btn { width: 50px; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 50%; transition: 0.3s; cursor: pointer; }
+        .action-sidebar { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 18px; z-index: 100; }
+        .action-btn { width: 52px; height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 50%; transition: 0.3s; cursor: pointer; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
         .action-btn i { font-size: 18px; }
-        .action-btn span { font-size: 10px; font-weight: bold; margin-top: 2px; }
+        .action-btn span { font-size: 10px; font-weight: bold; margin-top: 2px; color: #fff; }
 
-        /* شريط التقدم */
-        .progress-bar { position: absolute; bottom: 0; left: 0; height: 4px; background: var(--neon); width: 0%; z-index: 150; box-shadow: 0 0 10px var(--neon); }
+        .progress-bar { position: absolute; bottom: 0; left: 0; height: 3px; background: var(--neon); width: 0%; z-index: 150; box-shadow: 0 0 10px var(--neon); transition: width 0.1s linear; }
 
-        /* وصف الفيديو */
-        .v-details { position: absolute; bottom: 120px; left: 20px; right: 80px; z-index: 100; pointer-events: none; background: linear-gradient(transparent, rgba(0,0,0,0.8)); padding: 20px; border-radius: 0 0 0 20px; }
-        .v-title { font-family: 'Orbitron'; color: var(--neon); font-size: 16px; font-weight: 900; margin-bottom: 5px; }
-        .v-desc { font-size: 13px; color: rgba(255,255,255,0.9); max-width: 90%; }
+        .v-details { position: absolute; bottom: 110px; left: 20px; right: 80px; z-index: 100; pointer-events: none; }
+        .v-title { font-family: 'Orbitron'; color: var(--neon); font-size: 16px; font-weight: 900; margin-bottom: 4px; }
+        .v-desc { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.4; text-shadow: 1px 1px 2px #000; }
 
-        /* تأثير القلب عند النقر المزدوج */
-        .heart-pop { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); color: var(--neon); font-size: 80px; z-index: 200; pointer-events: none; animation: pop 0.6s ease-out; }
-        @keyframes pop { 0% { transform: translate(-50%, -50%) scale(0); opacity: 1; } 50% { transform: translate(-50%, -50%) scale(1.5); } 100% { transform: translate(-50%, -50%) scale(2); opacity: 0; } }
+        .heart-pop { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--neon); font-size: 100px; z-index: 200; pointer-events: none; opacity: 0; }
+        .animate-heart { animation: heartAnim 0.7s ease-out forwards; }
+        @keyframes heartAnim { 0% { transform: translate(-50%, -50%) scale(0); opacity: 0; } 50% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.2); } 100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; } }
 
-        #up-trigger { width: 55px; height: 55px; background: var(--neon); color: #000; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 0 30px var(--neon); cursor: pointer; transition: 0.3s; }
-        nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 88%; max-width: 420px; height: 75px; display: flex; justify-content: space-around; align-items: center; z-index: 200; box-shadow: 0 15px 50px rgba(0,0,0,0.9); }
-        #admin-panel { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.96); backdrop-filter: blur(30px); display: none; flex-direction: column; padding: 40px 20px; }
-        #chat-ov { position: fixed; inset: 0; z-index: 600; background: rgba(0,0,0,0.92); backdrop-filter: blur(25px); display: none; flex-direction: column; padding: 30px; }
+        #up-trigger { width: 55px; height: 55px; background: var(--neon); color: #000; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 0 30px var(--neon); cursor: pointer; z-index: 300; }
+        nav { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; height: 75px; display: flex; justify-content: space-around; align-items: center; z-index: 200; }
     </style>
 </head>
 <body>
@@ -56,128 +52,124 @@
     <main class="scroll-engine" id="video-stack"></main>
 
     <nav class="glass-ui">
-        <div class="cursor-pointer text-white/30" onclick="checkAdmin()"><i class="fas fa-user-shield text-xl"></i></div>
+        <div class="cursor-pointer text-white/40" onclick="checkAdmin()"><i class="fas fa-user-shield text-xl"></i></div>
         <div id="up-trigger"><i class="fas fa-plus"></i></div>
-        <div class="cursor-pointer" onclick="openAd(); toggleChat()"><i class="fas fa-comment-dots text-[#00ffcc] text-2xl"></i></div>
+        <div class="cursor-pointer" onclick="toggleChat()"><i class="fas fa-comment-dots text-[#00ffcc] text-2xl"></i></div>
     </nav>
 
-    <div id="admin-panel">
-        <div class="flex justify-between items-center mb-10">
-            <h2 class="font-[Orbitron] text-[#ffaa00] text-2xl font-black">CONTROL_CENTER</h2>
-            <button onclick="toggleAdmin()" class="bg-white/10 p-4 rounded-full"><i class="fas fa-times"></i></button>
-        </div>
-        <div id="admin-list" class="flex-1 overflow-y-auto space-y-4"></div>
+    <div id="admin-panel" style="position: fixed; inset: 0; background: #000; z-index: 2000; display: none; padding: 40px;">
+         <button onclick="this.parentElement.style.display='none'" class="mb-5 bg-white/10 px-4 py-2 rounded">إغلاق</button>
+         <div id="admin-list" class="overflow-y-auto h-full"></div>
     </div>
 
-    <div id="chat-ov">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="font-[Orbitron] text-[#00ffcc] tracking-[5px]">VOX_CHAT</h2>
-            <i class="fas fa-times text-white/40 text-2xl cursor-pointer" onclick="toggleChat()"></i>
-        </div>
-        <div id="chat-box" class="flex-1 overflow-y-auto space-y-4"></div>
-        <div class="mt-6 flex gap-3 p-2 glass-ui">
-            <input type="text" id="msg-input" class="bg-transparent flex-1 outline-none px-4 text-sm" placeholder="Signal...">
-            <button onclick="sendMsg()" class="bg-[#00ffcc] text-black px-8 py-3 rounded-xl font-bold">SEND</button>
-        </div>
+    <div id="chat-ov" style="position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 1000; display: none; padding: 20px;">
+        <div class="flex justify-between items-center mb-5"><h3>VOX_CHAT</h3><i class="fas fa-times cursor-pointer" onclick="toggleChat()"></i></div>
+        <div id="chat-box" class="flex-1 overflow-y-auto mb-4"></div>
+        <input type="text" id="msg-input" class="w-full bg-white/10 p-4 rounded mb-2" placeholder="اكتب شيئاً...">
+        <button onclick="sendMsg()" class="w-full bg-[#00ffcc] text-black py-3 rounded font-bold">إرسال</button>
     </div>
 
     <script>
         const MASTER_KEY = "1234";
-        const AD_LINKS = ["https://www.effectivegatecpm.com/q7bf96ad4p?key=4272e67963ce67f1cfaeb4a56682d6ec", "https://www.effectivegatecpm.com/w6ejwgptb?key=b77b52a8f4f7e4cdd1ac7bccc1b04a4d"];
-        let currentAd = 0;
-
         firebase.initializeApp({ databaseURL: "https://xkom-a73e4-default-rtdb.firebaseio.com/" });
         const db = firebase.database();
 
-        function openAd() { window.open(AD_LINKS[currentAd], '_blank'); currentAd = (currentAd + 1) % 2; }
         setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB'); }, 1000);
 
-        function handleDoubleTap(id, container) {
+        function handleLike(id, section) {
             const heart = document.createElement('div');
-            heart.className = 'heart-pop';
+            heart.className = 'heart-pop animate-heart';
             heart.innerHTML = '<i class="fas fa-bolt"></i>';
-            container.appendChild(heart);
+            section.appendChild(heart);
             db.ref('vox_god_content/' + id + '/likes').transaction(l => (l || 0) + 1);
-            setTimeout(() => heart.remove(), 600);
-        }
-
-        function updateProgress(vidId) {
-            const v = document.getElementById('vid-' + vidId);
-            const p = document.getElementById('prog-' + vidId);
-            if (v && p) p.style.width = (v.currentTime / v.duration) * 100 + '%';
+            setTimeout(() => heart.remove(), 700);
         }
 
         db.ref('vox_god_content').on('value', (snap) => {
             const container = document.getElementById('video-stack');
-            const adminList = document.getElementById('admin-list');
             const data = snap.val();
-            container.innerHTML = ''; adminList.innerHTML = '';
             if(!data) return;
+            container.innerHTML = '';
             Object.keys(data).reverse().forEach((id) => {
                 const vid = data[id];
                 const section = document.createElement('section');
                 section.className = 'v-seg';
-                let lastTap = 0;
+                let lastClick = 0;
                 section.innerHTML = `
                     <div class="watermark">VOX_GOD</div>
-                    <video id="vid-${id}" loop playsinline src="${vid.url}" ontimeupdate="updateProgress('${id}')"></video>
+                    <video id="vid-${id}" loop playsinline src="${vid.url}"></video>
                     <div class="progress-bar" id="prog-${id}"></div>
-                    
                     <div class="v-details">
-                        <div class="v-title">@VOX_SIGNAL_${id.substring(1,5)}</div>
-                        <div class="v-desc">المصدر: سحابة فوكس | المشاهدات: ${vid.views || 0}</div>
+                        <div class="v-title">@SIGNAL_DATA</div>
+                        <div class="v-desc">المشاهدات: ${vid.views || 0} | الإعجابات: ${vid.likes || 0}</div>
                     </div>
-
                     <div class="action-sidebar">
-                        <div class="action-btn glass-ui text-white" onclick="const v=document.getElementById('vid-${id}'); v.muted=!v.muted; this.innerHTML=v.muted?'<i class=\'fas fa-volume-mute\'></i>':'<i class=\'fas fa-volume-up\'></i>'"><i class="fas fa-volume-up"></i></div>
-                        <div class="action-btn glass-ui text-[#00ffcc]" onclick="db.ref('vox_god_content/${id}/likes').transaction(l=>(l||0)+1)"><i class="fas fa-bolt"></i><span>${vid.likes || 0}</span></div>
-                        <div class="action-btn glass-ui text-white" onclick="toggleChat()"><i class="fas fa-comment-dots"></i></div>
-                        <div class="action-btn glass-ui text-white" onclick="navigator.share({url:window.location.href})"><i class="fas fa-share-nodes"></i></div>
+                        <div class="action-btn" onclick="const v=document.getElementById('vid-${id}'); v.muted=!v.muted; this.innerHTML=v.muted?'<i class=\'fas fa-volume-mute\'></i>':'<i class=\'fas fa-volume-up\'></i>'"><i class="fas fa-volume-up"></i></div>
+                        <div class="action-btn text-[#00ffcc]" onclick="handleLike('${id}', this.parentElement.parentElement)"><i class="fas fa-bolt"></i><span>${vid.likes || 0}</span></div>
+                        <div class="action-btn text-white" onclick="toggleChat()"><i class="fas fa-comment-dots"></i></div>
+                        <div class="action-btn text-white" onclick="navigator.share({url:window.location.href})"><i class="fas fa-share-nodes"></i></div>
                     </div>
                 `;
-                section.onclick = (e) => {
-                    const now = Date.now();
-                    if(now - lastTap < 300) handleDoubleTap(id, section);
-                    else { const v = section.querySelector('video'); v.paused?v.play():v.pause(); }
-                    lastTap = now;
+                
+                const video = section.querySelector('video');
+                video.ontimeupdate = () => {
+                    const prog = document.getElementById('prog-' + id);
+                    if(prog) prog.style.width = (video.currentTime / video.duration) * 100 + '%';
                 };
+
+                section.onclick = (e) => {
+                    if(e.target.closest('.action-btn')) return;
+                    const time = Date.now();
+                    if(time - lastClick < 300) handleLike(id, section);
+                    else video.paused ? video.play() : video.pause();
+                    lastClick = time;
+                };
+                
                 container.appendChild(section);
-                adminList.innerHTML += `<div class="admin-card"><video class="w-16 h-16 rounded-xl object-cover" src="${vid.url}"></video><div class="flex-1 text-[10px] opacity-40">${id}</div><button onclick="db.ref('vox_god_content/${id}').remove()" class="text-red-500 p-4"><i class="fas fa-trash-alt"></i></button></div>`;
             });
             initObserver();
-        });
-
-        const myWidget = cloudinary.createUploadWidget({ cloudName: "dqzjfaqg4", uploadPreset: "vox_god" }, (err, res) => {
-            if (!err && res.event === "success") {
-                db.ref('vox_god_content/').push({ url: res.info.secure_url, likes: 0, views: 0, timestamp: Date.now() });
-                alert("تم الرفع!");
-            }
-        });
-        document.getElementById("up-trigger").onclick = () => myWidget.open();
-
-        function toggleChat() { const c = document.getElementById('chat-ov'); c.style.display = c.style.display==='flex'?'none':'flex'; }
-        function checkAdmin() { if(prompt("KEY:") === MASTER_KEY) { const a = document.getElementById('admin-panel'); a.style.display = 'flex'; } }
-        function toggleAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
-        function sendMsg() { const inp = document.getElementById('msg-input'); if(inp.value.trim()){ db.ref('vox_chat').push({text:inp.value}); inp.value=''; } }
-        db.ref('vox_chat').limitToLast(15).on('value', s => {
-            const box = document.getElementById('chat-box'); box.innerHTML = '';
-            s.forEach(m => { box.innerHTML += `<div class="p-3 glass-ui mb-2 border-l-2 border-[#00ffcc] text-sm">${m.val().text}</div>`; });
-            box.scrollTop = box.scrollHeight;
         });
 
         function initObserver() {
             const obs = new IntersectionObserver((es) => {
                 es.forEach(e => {
                     const v = e.target.querySelector('video');
-                    const id = v.id.replace('vid-', '');
-                    if(e.isIntersecting) { 
-                        v.play().catch(()=>{});
-                        db.ref('vox_god_content/' + id + '/views').transaction(v => (v || 0) + 1);
-                    } else { v.pause(); v.currentTime = 0; }
+                    if(e.isIntersecting) {
+                        v.play().catch(() => { v.muted = true; v.play(); });
+                        const id = v.id.replace('vid-', '');
+                        db.ref('vox_god_content/' + id + '/views').transaction(curr => (curr || 0) + 1);
+                    } else {
+                        v.pause();
+                        v.currentTime = 0;
+                    }
                 });
-            }, { threshold: 0.8 });
+            }, { threshold: 0.6 });
             document.querySelectorAll('.v-seg').forEach(s => obs.observe(s));
         }
+
+        const myWidget = cloudinary.createUploadWidget({ cloudName: "dqzjfaqg4", uploadPreset: "vox_god" }, (err, res) => {
+            if (!err && res.event === "success") {
+                db.ref('vox_god_content/').push({ url: res.info.secure_url, likes: 0, views: 0, timestamp: Date.now() });
+                alert("تم الرفع بنجاح!");
+            }
+        });
+        document.getElementById("up-trigger").onclick = () => myWidget.open();
+
+        function toggleChat() { const c = document.getElementById('chat-ov'); c.style.display = c.style.display==='flex'?'none':'flex'; }
+        function checkAdmin() { if(prompt("KEY:") === MASTER_KEY) document.getElementById('admin-panel').style.display='block'; }
+        function sendMsg() { 
+            const inp = document.getElementById('msg-input'); 
+            if(inp.value.trim()){ db.ref('vox_chat').push({text:inp.value}); inp.value=''; } 
+        }
+        db.ref('vox_chat').limitToLast(20).on('value', s => {
+            const box = document.getElementById('chat-box'); box.innerHTML = '';
+            s.forEach(m => { box.innerHTML += `<div class="p-3 bg-white/5 rounded mb-2 text-sm">${m.val().text}</div>`; });
+            box.scrollTop = box.scrollHeight;
+        });
+
+        document.addEventListener('touchstart', () => { 
+            document.querySelectorAll('video').forEach(v => { if(v.paused && v.closest('.v-seg').getBoundingClientRect().top === 0) v.play(); });
+        }, { once: true });
     </script>
 </body>
 </html>
